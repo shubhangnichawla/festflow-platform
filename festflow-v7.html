@@ -1,0 +1,1692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FestFlow — Complete Prototype v7</title>
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@400;500;600;700;800;900&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --v:#7C3AED;--lm:#C8F135;--cr:#FF4D6D;--sk:#38BDF8;
+  --ink:#0D0D0D;--chalk:#F5F0E8;
+  --d1:#0D0D0D;--d2:#111111;--d3:#1A1A1A;--d4:#252525;--d5:#333333;
+  --vl:rgba(124,58,237,0.12);--ll:rgba(200,241,53,0.12);
+  --cl:rgba(255,77,109,0.12);--sl:rgba(56,189,248,0.12);
+  --mid:#888888;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:#080808;color:var(--chalk);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+.ef{font-family:'Epilogue',sans-serif;}
+.mono{font-family:'DM Mono',monospace;}
+
+/* ── CHROME ── */
+.chrome{background:#111;border-bottom:1px solid #1e1e1e;padding:9px 18px;display:flex;align-items:center;gap:10px;flex-shrink:0;z-index:60;}
+.chrome-logo{font-family:'Epilogue',sans-serif;font-weight:900;font-size:15px;}
+.chrome-logo span{color:var(--lm);}
+.chrome-sep{width:1px;height:18px;background:#222;}
+.chrome-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;color:#888;text-transform:uppercase;}
+.portal-sw{display:flex;background:#1a1a1a;border:1px solid #222;border-radius:8px;padding:3px;gap:3px;}
+.ps-btn{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;padding:5px 13px;border:none;cursor:pointer;border-radius:5px;transition:all 0.2s;background:transparent;color:#999;}
+.ps-btn.active{color:var(--ink);font-weight:700;}
+.ps-btn.active.org{background:var(--lm);}
+.ps-btn.active.stu{background:var(--sk);}
+.ps-btn.active.ven{background:white;}
+.chrome-sp{flex:1;}
+.proto-tag{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:#888;background:#161616;border:1px solid #1e1e1e;padding:4px 10px;border-radius:4px;}
+
+/* ── IFACE ── */
+.iface{display:none;flex:1;overflow:hidden;flex-direction:column;}
+.iface.active{display:flex;}
+
+/* ════════════════════════════════════════════
+   ORGANIZER
+════════════════════════════════════════════ */
+#iface-org{background:var(--d1);}
+
+/* Topbar */
+.o-top{background:var(--d2);border-bottom:1px solid #181818;padding:0 16px;height:50px;display:flex;align-items:center;gap:11px;flex-shrink:0;position:relative;z-index:50;}
+.o-logo{font-family:'Epilogue',sans-serif;font-weight:900;font-size:15px;}
+.o-logo span{color:var(--lm);}
+
+/* Fest dropdown */
+.fdrop{position:relative;}
+.fdrop-btn{background:var(--d3);border:1px solid var(--d4);color:var(--chalk);font-family:'DM Mono',monospace;font-size:10px;padding:6px 11px;border-radius:7px;cursor:pointer;display:flex;align-items:center;gap:7px;min-width:175px;transition:border-color .2s;}
+.fdrop-btn:hover{border-color:var(--d5);}
+.fdrop-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.fdrop-name{flex:1;}
+.fdrop-arr{color:var(--mid);font-size:10px;transition:transform .2s;}
+.fdrop.open .fdrop-arr{transform:rotate(180deg);}
+.fdrop-menu{display:none;position:absolute;top:calc(100% + 5px);left:0;background:#161616;border:1px solid var(--d4);border-radius:10px;padding:5px;z-index:200;min-width:215px;box-shadow:0 14px 32px rgba(0,0,0,.55);}
+.fdrop.open .fdrop-menu{display:block;}
+.fopt{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:7px;cursor:pointer;transition:background .15s;}
+.fopt:hover{background:var(--d3);}
+.fopt.active{background:var(--vl);}
+.fopt-ico{font-size:15px;}
+.fopt-name{font-family:'Epilogue',sans-serif;font-size:12px;font-weight:700;flex:1;}
+.fopt-badge{font-family:'DM Mono',monospace;font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;}
+
+.o-sp{flex:1;}
+
+/* Notification */
+.notif-wrap{position:relative;}
+.notif-btn{width:30px;height:30px;background:var(--d3);border:1px solid var(--d4);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;position:relative;transition:border-color .2s;}
+.notif-btn:hover{border-color:var(--d5);}
+.notif-badge{position:absolute;top:-2px;right:-2px;width:7px;height:7px;background:var(--cr);border-radius:50%;}
+.notif-panel{display:none;position:absolute;top:calc(100% + 7px);right:0;background:#161616;border:1px solid var(--d4);border-radius:12px;padding:14px;width:300px;z-index:200;box-shadow:0 14px 32px rgba(0,0,0,.55);}
+.notif-wrap.open .notif-panel{display:block;}
+.notif-hd{font-family:'Epilogue',sans-serif;font-size:13px;font-weight:800;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;}
+.notif-hd span{font-family:'DM Mono',monospace;font-size:9px;color:var(--cr);font-weight:700;cursor:pointer;}
+.notif-item{display:flex;gap:9px;padding:9px;border-radius:8px;margin-bottom:5px;cursor:pointer;transition:background .15s;}
+.notif-item:hover{background:var(--d3);}
+.notif-item:last-child{margin-bottom:0;}
+.ni-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.ni-txt{flex:1;font-size:11.5px;color:#aaa;line-height:1.45;}
+.ni-txt strong{color:var(--chalk);}
+.ni-time{font-family:'DM Mono',monospace;font-size:9px;color:#aaa;white-space:nowrap;margin-top:1px;}
+
+/* Avatar dropdown */
+.avatar-wrap{position:relative;}
+.o-avatar{width:30px;height:30px;background:linear-gradient(135deg,var(--v),var(--sk));border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Epilogue',sans-serif;font-size:11px;font-weight:800;cursor:pointer;transition:opacity .2s;}
+.o-avatar:hover{opacity:.85;}
+.avatar-menu{display:none;position:absolute;top:calc(100% + 7px);right:0;background:#161616;border:1px solid var(--d4);border-radius:12px;padding:10px;width:200px;z-index:200;box-shadow:0 14px 32px rgba(0,0,0,.55);}
+.avatar-wrap.open .avatar-menu{display:block;}
+.av-info{padding:10px;border-bottom:1px solid var(--d4);margin-bottom:7px;}
+.av-name{font-family:'Epilogue',sans-serif;font-size:14px;font-weight:800;margin-bottom:2px;}
+.av-role{font-family:'DM Mono',monospace;font-size:10px;color:#bbb;}
+.av-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:7px;cursor:pointer;font-size:12px;color:#ccc;transition:all .15s;}
+.av-item:hover{background:var(--d3);color:var(--chalk);}
+.av-item.danger{color:var(--cr);}
+.av-item.danger:hover{background:var(--cl);}
+
+/* Body */
+.o-body{display:flex;flex:1;overflow:hidden;}
+
+/* ── SIDEBAR ── */
+.o-sidebar{width:190px;background:var(--d2);border-right:1px solid #161616;padding:10px 8px;display:flex;flex-direction:column;gap:2px;flex-shrink:0;overflow-y:auto;overflow-x:hidden;transition:width .25s ease;}
+.o-sidebar.collapsed{width:52px;}
+.sidebar-toggle{display:flex;align-items:center;justify-content:flex-end;padding:4px 2px 8px;margin-bottom:2px;}
+.toggle-btn{background:none;border:1px solid var(--d4);color:var(--mid);border-radius:6px;width:26px;height:26px;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;}
+.toggle-btn:hover{border-color:var(--d5);color:var(--chalk);}
+.nav-sec-lbl{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:3px;color:#666;text-transform:uppercase;padding:7px 8px 3px;white-space:nowrap;overflow:hidden;transition:opacity .2s;}
+.o-sidebar.collapsed .nav-sec-lbl{opacity:0;height:0;padding:0;margin:0;}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;cursor:pointer;transition:all .15s;color:var(--mid);font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;}
+.nav-item:hover{background:#141414;color:#888;}
+.nav-item.on{background:var(--vl);color:var(--v);font-weight:600;}
+.nav-ico{font-size:15px;width:18px;text-align:center;flex-shrink:0;}
+.nav-label{flex:1;transition:opacity .2s;overflow:hidden;}
+.o-sidebar.collapsed .nav-label{opacity:0;width:0;}
+.nav-arr{font-size:10px;color:var(--mid);transition:opacity .2s;}
+.o-sidebar.collapsed .nav-arr{opacity:0;width:0;}
+
+/* Sub-nav */
+.nav-sub{display:none;flex-direction:column;gap:1px;padding-left:8px;margin-top:1px;}
+.nav-sub.open{display:flex;}
+.o-sidebar.collapsed .nav-sub{display:none!important;}
+.nav-sub-item{display:flex;align-items:center;gap:8px;padding:7px 10px 7px 14px;border-radius:7px;cursor:pointer;transition:all .15s;color:#aaa;font-size:12px;position:relative;white-space:nowrap;}
+.nav-sub-item::before{content:'';position:absolute;left:6px;top:50%;transform:translateY(-50%);width:1px;height:55%;background:var(--d4);}
+.nav-sub-item:hover{background:#141414;color:#777;}
+.nav-sub-item.on{color:var(--lm);background:var(--ll);}
+.sub-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.sub-name{font-family:'Epilogue',sans-serif;font-weight:600;flex:1;}
+
+.sidebar-foot{margin-top:auto;padding-top:8px;border-top:1px solid #161616;}
+
+/* Content */
+.o-content{flex:1;overflow-y:auto;background:var(--d1);}
+.o-screen{display:none;padding:20px;}
+.o-screen.on{display:block;}
+
+/* HOME */
+.pg-title{font-family:'Epilogue',sans-serif;font-size:23px;font-weight:900;line-height:1.1;margin-bottom:4px;}
+.pg-sub{font-family:'DM Mono',monospace;font-size:12px;color:#aaa;margin-bottom:20px;}
+
+.act-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:22px;}
+.act-card{border-radius:16px;padding:24px;cursor:pointer;transition:transform .2s,box-shadow .2s;position:relative;overflow:hidden;}
+.act-card:hover{transform:translateY(-3px);box-shadow:0 16px 36px rgba(0,0,0,.45);}
+.ac-create{background:linear-gradient(135deg,#1a0a3e,#2d1260);}
+.ac-view{background:linear-gradient(135deg,#003a52,#001a30);}
+.ac-badge{position:absolute;top:13px;right:13px;font-family:'DM Mono',monospace;font-size:9px;font-weight:700;padding:3px 9px;border-radius:4px;}
+.ac-ico{font-size:32px;margin-bottom:10px;}
+.ac-title{font-family:'Epilogue',sans-serif;font-size:18px;font-weight:800;margin-bottom:5px;}
+.ac-sub{font-size:12px;color:#aaa;line-height:1.5;margin-bottom:14px;}
+
+.sec-title{font-family:'Epilogue',sans-serif;font-size:14px;font-weight:800;margin-bottom:11px;display:flex;align-items:center;justify-content:space-between;}
+.sec-link{font-family:'DM Mono',monospace;font-size:10px;color:var(--mid);font-weight:400;cursor:pointer;}
+.sec-link:hover{color:#888;}
+.ev-row{background:var(--d3);border:1px solid var(--d4);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:border-color .18s;margin-bottom:7px;}
+.ev-row:hover{border-color:var(--v);}
+.ev-ico{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.ev-name{font-family:'Epilogue',sans-serif;font-size:13px;font-weight:700;margin-bottom:2px;}
+.ev-meta{font-family:'DM Mono',monospace;font-size:11px;color:#aaa;}
+.ev-sp{flex:1;}
+.sbadge{display:inline-block;font-family:'DM Mono',monospace;font-size:10px;font-weight:700;padding:3px 9px;border-radius:4px;}
+
+/* EVENT DETAIL */
+.event-hdr{background:var(--d3);border:1px solid var(--d4);border-radius:13px;padding:16px;margin-bottom:14px;display:flex;gap:13px;align-items:flex-start;}
+.ehdr-ico{width:50px;height:50px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.ehdr-name{font-family:'Epilogue',sans-serif;font-size:21px;font-weight:900;margin-bottom:3px;}
+.ehdr-meta{font-family:'DM Mono',monospace;font-size:11px;color:#bbb;margin-bottom:7px;}
+.ehdr-tags{display:flex;gap:5px;flex-wrap:wrap;}
+.ehdr-sp{flex:1;}
+.ehdr-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;}
+
+/* Mod tabs */
+.mod-tabs{display:flex;gap:2px;flex-wrap:wrap;margin-bottom:16px;border-bottom:1px solid var(--d4);padding-bottom:0;}
+.mod-tab{font-family:'DM Mono',monospace;font-size:11px;padding:9px 14px;border:none;background:transparent;color:#aaa;cursor:pointer;transition:all .15s;border-bottom:2px solid transparent;margin-bottom:-1px;}
+.mod-tab:hover{color:#888;}
+.mod-tab.on{color:var(--v);border-bottom-color:var(--v);font-weight:700;}
+.mod-panel{display:none;}
+.mod-panel.on{display:block;}
+
+/* Shared cards */
+.card{background:var(--d3);border:1px solid var(--d4);border-radius:13px;padding:17px;}
+.card-title{font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#ccc;margin-bottom:13px;display:flex;align-items:center;justify-content:space-between;}
+.c2{display:grid;grid-template-columns:1fr 320px;gap:13px;margin-bottom:13px;}
+.c2e{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:13px;}
+.c3{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-bottom:14px;}
+.c4{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:16px;}
+.stat-card{background:var(--d3);border:1px solid var(--d4);border-radius:12px;padding:14px;}
+.stat-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#aaa;margin-bottom:6px;}
+.stat-val{font-family:'Epilogue',sans-serif;font-size:25px;font-weight:900;line-height:1;}
+.stat-sub{font-family:'DM Mono',monospace;font-size:10px;margin-top:4px;}
+.alert-item{display:flex;align-items:center;gap:9px;padding:9px 11px;background:#141414;border-radius:8px;margin-bottom:6px;font-size:12px;}
+.adot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.atxt{flex:1;color:#aaa;line-height:1.4;}
+.atime{font-family:'DM Mono',monospace;font-size:9px;color:#aaa;}
+.donut-wrap{display:flex;align-items:center;justify-content:center;gap:16px;}
+.dl{display:flex;flex-direction:column;gap:7px;}
+.dl-item{display:flex;align-items:center;gap:7px;font-size:11px;}
+.dl-sq{width:9px;height:9px;border-radius:2px;flex-shrink:0;}
+.dl-name{color:#888;}
+.dl-pct{font-weight:700;margin-left:auto;font-family:'DM Mono',monospace;font-size:10px;}
+.pill{padding:5px 10px;border-radius:6px;font-family:'DM Mono',monospace;font-size:10px;font-weight:700;}
+.pills-row{display:flex;gap:6px;flex-wrap:wrap;}
+.bbar{margin-bottom:8px;}
+.bbar-lbl{display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;}
+.bbar-cat{color:#ccc;font-weight:600;}
+.bbar-amt{font-family:'DM Mono',monospace;font-size:11px;color:#bbb;}
+.bbar-track{height:7px;background:var(--d3);border-radius:4px;overflow:hidden;}
+.bbar-fill{height:100%;border-radius:4px;}
+.exp-row{display:flex;align-items:center;gap:11px;padding:9px 12px;background:var(--d2);border:1px solid var(--d3);border-radius:8px;margin-bottom:5px;font-size:12px;}
+.exp-cat{padding:3px 8px;border-radius:4px;font-family:'DM Mono',monospace;font-size:11px;font-weight:700;}
+.tier-card{background:var(--d2);border:1px solid var(--d4);border-radius:11px;padding:14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;}
+.tier-ico{width:40px;height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.tier-info{flex:1;}
+.tier-name{font-family:'Epilogue',sans-serif;font-weight:700;font-size:13px;}
+.tier-price{font-family:'DM Mono',monospace;font-size:11px;margin-top:2px;}
+.tier-prog{width:110px;}
+.tier-cnt{font-family:'DM Mono',monospace;font-size:11px;color:#bbb;margin-bottom:4px;text-align:right;}
+.tbar{height:5px;background:#1a1a1a;border-radius:3px;overflow:hidden;}
+.tbar-fill{height:100%;border-radius:3px;}
+.vendor-card{background:var(--d2);border:1px solid var(--d4);border-radius:11px;padding:14px;transition:border-color .18s,transform .18s;cursor:pointer;}
+.vendor-card:hover{border-color:var(--v);transform:translateY(-2px);}
+.vc-top{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.vc-logo{width:36px;height:36px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:white;flex-shrink:0;}
+.vc-name{font-family:'Epilogue',sans-serif;font-weight:700;font-size:13px;}
+.vc-cat{font-family:'DM Mono',monospace;font-size:10px;color:#bbb;margin-top:2px;}
+.vc-offer{font-family:'Epilogue',sans-serif;font-size:16px;font-weight:800;margin-bottom:7px;}
+.vc-offer span{font-family:'DM Mono',monospace;font-size:11px;color:var(--mid);font-weight:400;}
+.vc-btns{display:flex;gap:5px;}
+.btn-acc{background:var(--vl);color:var(--v);border:1px solid rgba(124,58,237,.3);padding:6px 12px;border-radius:6px;font-family:'DM Mono',monospace;font-size:10px;font-weight:700;cursor:pointer;}
+.btn-vsm{background:var(--d3);color:#666;border:1px solid var(--d4);padding:6px 12px;border-radius:6px;font-family:'DM Mono',monospace;font-size:10px;cursor:pointer;}
+.sp-row{display:flex;align-items:center;gap:11px;padding:9px 12px;background:var(--d2);border:1px solid var(--d3);border-radius:8px;margin-bottom:5px;font-size:12px;}
+.sp-acc-pill{background:var(--ll);color:#3d6400;font-family:'DM Mono',monospace;font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;}
+.sp-pen-pill{background:var(--sl);color:#005588;font-family:'DM Mono',monospace;font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;}
+.team-card{background:var(--d2);border:1px solid var(--d4);border-radius:11px;padding:12px;margin-bottom:7px;display:flex;align-items:center;gap:10px;}
+.team-stripe{width:5px;height:36px;border-radius:3px;flex-shrink:0;}
+.team-info{flex:1;}
+.team-name{font-family:'Epilogue',sans-serif;font-weight:700;font-size:13px;}
+.team-lead{font-family:'DM Mono',monospace;font-size:10px;color:var(--mid);margin-top:1px;}
+.team-avs{display:flex;margin-top:4px;}
+.m-av{width:19px;height:19px;border-radius:50%;border:2px solid var(--d2);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;margin-left:-4px;}
+.m-av:first-child{margin-left:0;}
+.task-board{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;}
+.task-col{background:#0e0e0e;border:1px solid #181818;border-radius:9px;padding:9px;}
+.task-col-hd{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#aaa;margin-bottom:8px;}
+.task-item{background:var(--d3);border:1px solid var(--d4);border-radius:7px;padding:8px;margin-bottom:5px;font-size:11px;color:#aaa;cursor:grab;}
+.task-item:hover{border-color:var(--d5);}
+.task-tag{display:inline-block;padding:2px 5px;border-radius:3px;font-family:'DM Mono',monospace;font-size:8px;font-weight:700;margin-bottom:3px;}
+
+/* Activities */
+.day-tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px;}
+.day-tab{font-family:'DM Mono',monospace;font-size:11px;padding:8px 14px;border:1px solid var(--d4);border-radius:7px;cursor:pointer;transition:all .15s;background:transparent;color:#aaa;}
+.day-tab:hover{border-color:var(--d5);color:#888;}
+.day-tab.on{background:var(--v);border-color:var(--v);color:white;font-weight:700;}
+.act-list{display:flex;flex-direction:column;}
+.act-item{display:flex;gap:0;}
+.act-left{display:flex;flex-direction:column;align-items:center;width:56px;flex-shrink:0;}
+.act-time{font-family:'DM Mono',monospace;font-size:11px;color:#bbb;text-align:center;line-height:1.3;padding-top:2px;white-space:nowrap;}
+.act-dot{width:11px;height:11px;border-radius:50%;border:2px solid var(--v);background:var(--d1);flex-shrink:0;margin-top:5px;}
+.act-dot.done{background:var(--v);}
+.act-dot.live{background:var(--lm);border-color:var(--lm);box-shadow:0 0 8px rgba(200,241,53,.5);}
+.act-line{width:2px;flex:1;background:var(--d4);min-height:12px;}
+.act-card{flex:1;background:var(--d3);border:1px solid var(--d4);border-radius:11px;padding:12px 14px;margin-bottom:8px;margin-left:9px;transition:border-color .15s;}
+.act-card:hover{border-color:var(--d5);}
+.act-card.live-card{border-color:var(--lm);}
+.act-card.done-card{opacity:0.55;}
+.act-top{display:flex;align-items:flex-start;gap:8px;margin-bottom:5px;}
+.act-title{font-family:'Epilogue',sans-serif;font-size:13px;font-weight:700;flex:1;}
+.act-dur{font-family:'DM Mono',monospace;font-size:11px;color:#bbb;flex-shrink:0;margin-top:2px;}
+.act-desc{font-size:12.5px;color:#bbb;line-height:1.65;margin-bottom:7px;}
+.act-footer{display:flex;gap:7px;flex-wrap:wrap;align-items:center;}
+.act-venue{font-family:'DM Mono',monospace;font-size:11px;color:#bbb;}
+.act-team{font-family:'DM Mono',monospace;font-size:11px;color:#bbb;}
+.act-tags-r{display:flex;gap:4px;margin-left:auto;}
+.add-act-btn{background:var(--vl);border:1px dashed rgba(124,58,237,.3);color:var(--v);border-radius:11px;padding:10px;font-family:'Epilogue',sans-serif;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;margin-bottom:9px;margin-left:65px;width:calc(100% - 65px);transition:background .15s;}
+.add-act-btn:hover{background:rgba(124,58,237,.2);}
+
+/* Volunteer announcement */
+.vol-ann{background:linear-gradient(135deg,#1a0a3e,#0a0020);border:1px solid rgba(124,58,237,.3);border-radius:13px;padding:17px;margin-bottom:14px;}
+.vol-ann-title{font-family:'Epilogue',sans-serif;font-size:14px;font-weight:800;color:var(--chalk);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.vol-form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.vol-form-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;}
+.f-inp{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(124,58,237,.25);color:var(--chalk);font-family:'DM Sans',sans-serif;font-size:12px;padding:9px 11px;border-radius:8px;outline:none;transition:border-color .2s;}
+.f-inp:focus{border-color:var(--v);}
+.f-inp::placeholder{color:#666;}
+.f-sel{cursor:pointer;}
+.ann-card{background:var(--d3);border:1px solid var(--d4);border-radius:10px;padding:13px;margin-bottom:7px;display:flex;gap:12px;align-items:flex-start;}
+.ann-card-ico{width:38px;height:38px;background:var(--vl);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.ann-card-body{flex:1;}
+.ann-card-title{font-family:'Epilogue',sans-serif;font-size:13px;font-weight:700;margin-bottom:3px;}
+.ann-card-meta{font-family:'DM Mono',monospace;font-size:11px;color:#bbb;margin-bottom:5px;}
+.ann-card-desc{font-size:11.5px;color:#888;line-height:1.5;}
+.ann-card-footer{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;align-items:center;}
+
+/* ── VENDOR SURF PAGE ── */
+.vsurf-filter{display:flex;gap:7px;margin-bottom:16px;align-items:center;flex-wrap:wrap;}
+.vsurf-search{flex:1;min-width:140px;background:var(--d3);border:1px solid var(--d4);border-radius:8px;display:flex;align-items:center;gap:7px;padding:0 11px;}
+.vsurf-search input{background:transparent;border:none;outline:none;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--chalk);width:100%;padding:9px 0;}
+.vsurf-search input::placeholder{color:#666;}
+.vsurf-cats{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px;}
+.vcat-btn{font-family:'DM Mono',monospace;font-size:11px;padding:7px 13px;border-radius:20px;border:1px solid var(--d4);color:#aaa;cursor:pointer;background:transparent;white-space:nowrap;transition:all .15s;}
+.vcat-btn:hover{border-color:var(--d5);color:#888;}
+.vcat-btn.on{background:var(--v);border-color:var(--v);color:white;font-weight:700;}
+.vsurf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.vsurf-card{background:var(--d3);border:1px solid var(--d4);border-radius:12px;overflow:hidden;transition:border-color .18s,transform .18s;cursor:default;}
+.vsurf-card:hover{border-color:var(--v);transform:translateY(-2px);}
+.vsurf-banner{height:60px;display:flex;align-items:center;justify-content:center;font-size:26px;position:relative;}
+.vsurf-rating{position:absolute;top:7px;right:7px;background:rgba(0,0,0,.6);border-radius:5px;padding:3px 8px;font-family:'DM Mono',monospace;font-size:11px;font-weight:700;color:var(--lm);}
+.vsurf-body{padding:13px;}
+.vsurf-name{font-family:'Epilogue',sans-serif;font-size:14px;font-weight:800;margin-bottom:2px;}
+.vsurf-cat{font-family:'DM Mono',monospace;font-size:11px;color:#bbb;margin-bottom:6px;letter-spacing:1px;text-transform:uppercase;}
+.vsurf-tags{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:9px;}
+.vsurf-tag{font-family:'DM Mono',monospace;font-size:10px;padding:3px 8px;border-radius:4px;}
+.vsurf-price{font-family:'Epilogue',sans-serif;font-size:15px;font-weight:800;color:var(--lm);margin-bottom:10px;}
+.vsurf-price span{font-size:11px;color:#bbb;font-weight:400;font-family:'DM Mono',monospace;}
+.vsurf-btns{display:flex;gap:6px;}
+.btn-select{background:var(--v);color:white;border:none;padding:7px 14px;border-radius:7px;font-family:'DM Mono',monospace;font-size:10px;font-weight:700;cursor:pointer;flex:1;transition:opacity .2s;}
+.btn-select:hover{opacity:.88;}
+.btn-select.selected{background:var(--ll);color:#5a8a00;border:1px solid rgba(90,138,0,.3);}
+.btn-info{background:var(--d4);color:#888;border:none;padding:7px 10px;border-radius:7px;font-family:'DM Mono',monospace;font-size:10px;cursor:pointer;transition:all .15s;}
+.btn-info:hover{background:var(--d5);color:var(--chalk);}
+
+/* Buttons */
+.btn-prim{background:var(--v);color:white;border:none;padding:10px 18px;border-radius:8px;font-family:'Epilogue',sans-serif;font-weight:700;font-size:13px;cursor:pointer;transition:opacity .18s;}
+.btn-prim:hover{opacity:.88;}
+.btn-lime-full{background:var(--lm);color:var(--ink);border:none;padding:10px 18px;border-radius:8px;font-family:'Epilogue',sans-serif;font-weight:700;font-size:13px;cursor:pointer;transition:opacity .18s;}
+.btn-lime-full:hover{opacity:.88;}
+.btn-ghost-sm{background:var(--d3);color:#ccc;border:1px solid var(--d5);padding:9px 15px;border-radius:8px;font-family:'Epilogue',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;}
+.btn-ghost-sm:hover{color:var(--chalk);border-color:var(--d5);}
+
+/* Modals */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:300;align-items:center;justify-content:center;}
+.modal-bg.open{display:flex;}
+.modal-box{background:#161616;border:1px solid var(--d4);border-radius:17px;padding:24px;width:420px;max-height:88vh;overflow-y:auto;}
+.modal-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+.modal-hd h3{font-family:'Epilogue',sans-serif;font-size:16px;font-weight:800;}
+.modal-close{background:none;border:none;color:var(--mid);cursor:pointer;font-size:17px;}
+.fg{margin-bottom:12px;}
+.fl{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:2px;color:#bbb;margin-bottom:5px;display:block;text-transform:uppercase;}
+.fi{width:100%;background:var(--d3);border:1px solid var(--d4);color:var(--chalk);font-family:'DM Sans',sans-serif;font-size:13px;padding:9px 11px;border-radius:8px;outline:none;transition:border-color .18s;}
+.fi:focus{border-color:var(--v);}
+.fi::placeholder{color:#666;}
+.ftxt{min-height:68px;resize:vertical;}
+.fi2{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+
+/* Account screen */
+.acc-hero{background:var(--d3);border:1px solid var(--d4);border-radius:13px;padding:22px;margin-bottom:16px;display:flex;gap:16px;align-items:center;}
+.acc-av-big{width:64px;height:64px;background:linear-gradient(135deg,var(--v),var(--sk));border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:'Epilogue',sans-serif;font-size:22px;font-weight:900;flex-shrink:0;}
+.acc-name{font-family:'Epilogue',sans-serif;font-size:22px;font-weight:900;}
+.acc-role{font-family:'DM Mono',monospace;font-size:10px;color:var(--v);margin-top:2px;margin-bottom:6px;}
+.acc-college{font-size:12px;color:#888;}
+.acc-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px;}
+.acc-section{background:var(--d3);border:1px solid var(--d4);border-radius:13px;padding:17px;}
+.acc-sec-title{font-family:'Epilogue',sans-serif;font-size:13px;font-weight:700;margin-bottom:13px;}
+.acc-field{margin-bottom:11px;}
+.acc-field-lbl{font-family:'DM Mono',monospace;font-size:11px;color:#bbb;margin-bottom:4px;letter-spacing:1px;text-transform:uppercase;}
+.acc-field-val{font-size:13px;color:var(--chalk);}
+
+/* ════════════════════════════════════════════
+   STUDENT INTERFACE (from v2, unchanged)
+════════════════════════════════════════════ */
+#iface-stu{background:var(--d1);}
+.s-topbar{background:var(--d2);border-bottom:1px solid #181818;padding:0 20px;height:50px;display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.s-logo{font-family:'Epilogue',sans-serif;font-weight:900;font-size:15px;}
+.s-logo span{color:var(--sk);}
+.s-search{flex:1;max-width:340px;background:var(--d3);border:1px solid var(--d4);border-radius:8px;display:flex;align-items:center;gap:8px;padding:0 12px;}
+.s-search-ico{font-size:13px;color:var(--mid);}
+.s-search input{background:transparent;border:none;outline:none;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--chalk);width:100%;padding:8px 0;}
+.s-search input::placeholder{color:#666;}
+.s-spacer{flex:1;}
+.s-nav-tabs{display:flex;gap:2px;}
+.s-nav-tab{font-family:'DM Mono',monospace;font-size:11px;padding:7px 13px;border-radius:7px;cursor:pointer;color:#aaa;border:none;background:transparent;transition:all .2s;}
+.s-nav-tab.on{background:var(--sl);color:var(--sk);}
+.s-avatar{width:30px;height:30px;background:linear-gradient(135deg,var(--sk),var(--v));border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Epilogue',sans-serif;font-size:11px;font-weight:800;}
+.s-body{flex:1;overflow-y:auto;}
+.s-screen{display:none;padding:22px;}
+.s-screen.on{display:block;}
+.s-hero{background:linear-gradient(135deg,#1a0a3e 0%,#003a52 100%);border-radius:16px;padding:24px;margin-bottom:22px;position:relative;overflow:hidden;}
+.s-hero::after{content:'';position:absolute;right:-40px;top:-40px;width:200px;height:200px;background:rgba(124,58,237,.15);border-radius:50%;}
+.s-hero h2{font-family:'Epilogue',sans-serif;font-size:24px;font-weight:900;margin-bottom:6px;position:relative;}
+.s-hero h2 span{color:var(--lm);}
+.s-hero p{font-family:'DM Sans',sans-serif;font-size:13px;color:#aaa;margin-bottom:16px;position:relative;}
+.s-hero-btns{display:flex;gap:8px;position:relative;}
+.s-filter-bar{display:flex;gap:8px;margin-bottom:18px;overflow-x:auto;padding-bottom:4px;}
+.s-filter-btn{font-family:'DM Mono',monospace;font-size:11px;padding:7px 14px;border-radius:20px;border:1px solid var(--d4);color:var(--mid);cursor:pointer;background:transparent;white-space:nowrap;transition:all .2s;}
+.s-filter-btn:hover{border-color:var(--d5);color:#888;}
+.s-filter-btn.on{background:var(--sk);border-color:var(--sk);color:var(--ink);font-weight:700;}
+.s-events-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px;}
+.s-ev-card{background:var(--d3);border:1px solid var(--d4);border-radius:14px;overflow:hidden;cursor:pointer;transition:transform .2s,border-color .2s,box-shadow .2s;}
+.s-ev-card:hover{transform:translateY(-3px);border-color:var(--sk);box-shadow:0 12px 30px rgba(0,0,0,.3);}
+.s-ev-banner{height:90px;display:flex;align-items:center;justify-content:center;font-size:30px;position:relative;}
+.s-ev-trend{position:absolute;top:8px;right:8px;}
+.s-ev-body{padding:14px;}
+.s-ev-college{font-family:'DM Mono',monospace;font-size:10px;color:#aaa;margin-bottom:3px;letter-spacing:1px;text-transform:uppercase;}
+.s-ev-name{font-family:'Epilogue',sans-serif;font-size:15px;font-weight:800;margin-bottom:4px;}
+.s-ev-meta{font-family:'DM Mono',monospace;font-size:11px;color:#aaa;margin-bottom:10px;}
+.s-ev-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;}
+.s-ev-footer{display:flex;align-items:center;justify-content:space-between;}
+.s-ev-price{font-family:'Epilogue',sans-serif;font-size:14px;font-weight:800;}
+.s-ev-detail-header{background:var(--d3);border:1px solid var(--d4);border-radius:14px;overflow:hidden;margin-bottom:18px;}
+.s-ev-detail-banner{height:110px;display:flex;align-items:center;justify-content:center;font-size:50px;}
+.s-ev-detail-body{padding:18px;}
+.s-ev-detail-name{font-family:'Epilogue',sans-serif;font-size:24px;font-weight:900;margin-bottom:4px;}
+.s-ev-detail-meta{font-family:'DM Mono',monospace;font-size:12px;color:#bbb;margin-bottom:10px;}
+.s-ev-detail-desc{font-size:13px;color:#bbb;line-height:1.7;margin-bottom:14px;}
+.s-ev-two{display:grid;grid-template-columns:1fr 320px;gap:16px;}
+.s-schedule-card{background:var(--d3);border:1px solid var(--d4);border-radius:14px;padding:16px;}
+.s-sched-title{font-family:'Epilogue',sans-serif;font-size:13px;font-weight:700;margin-bottom:12px;}
+.s-sched-day-tabs{display:flex;gap:5px;margin-bottom:12px;flex-wrap:wrap;}
+.s-sched-dtab{font-family:'DM Mono',monospace;font-size:11px;padding:5px 10px;border-radius:5px;border:1px solid var(--d4);cursor:pointer;color:var(--mid);background:transparent;}
+.s-sched-dtab.on{background:var(--sk);border-color:var(--sk);color:var(--ink);font-weight:700;}
+.s-sched-act{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--d4);}
+.s-sched-act:last-child{border-bottom:none;}
+.s-sched-time{font-family:'DM Mono',monospace;font-size:11px;color:#bbb;width:70px;flex-shrink:0;}
+.s-sched-name{font-family:'Epilogue',sans-serif;font-size:12px;font-weight:700;margin-bottom:2px;}
+.s-sched-venue{font-family:'DM Mono',monospace;font-size:11px;color:#bbb;}
+.ticket-box{background:var(--d3);border:1px solid var(--d4);border-radius:14px;padding:18px;}
+.ticket-box-title{font-family:'Epilogue',sans-serif;font-size:14px;font-weight:800;margin-bottom:14px;}
+.ticket-tier{background:var(--d2);border:1px solid var(--d4);border-radius:10px;padding:13px;margin-bottom:8px;cursor:pointer;transition:border-color .2s;}
+.ticket-tier:hover,.ticket-tier.sel{border-color:var(--sk);}
+.ticket-tier.sel{background:var(--sl);}
+.tt-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+.tt-name{font-family:'Epilogue',sans-serif;font-size:13px;font-weight:700;}
+.tt-price{font-family:'Epilogue',sans-serif;font-size:16px;font-weight:800;color:var(--sk);}
+.tt-avail{font-family:'DM Mono',monospace;font-size:11px;color:#aaa;}
+.tt-sel-circle{width:14px;height:14px;border-radius:50%;border:2px solid var(--d5);flex-shrink:0;}
+.ticket-tier.sel .tt-sel-circle{background:var(--sk);border-color:var(--sk);}
+.qty-row{display:flex;align-items:center;gap:10px;margin:12px 0;}
+.qty-btn{width:30px;height:30px;background:var(--d4);border:none;color:var(--chalk);font-size:16px;border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.qty-val{font-family:'Epilogue',sans-serif;font-size:18px;font-weight:800;min-width:28px;text-align:center;}
+.ticket-total{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-top:1px solid var(--d4);border-bottom:1px solid var(--d4);margin-bottom:12px;}
+.ticket-total-label{font-family:'DM Mono',monospace;font-size:11px;color:#aaa;}
+.ticket-total-val{font-family:'Epilogue',sans-serif;font-size:20px;font-weight:900;color:var(--lm);}
+.my-ticket-card{background:var(--d3);border:1px solid var(--d4);border-radius:14px;overflow:hidden;margin-bottom:12px;display:flex;}
+.mtc-left{width:7px;flex-shrink:0;}
+.mtc-body{flex:1;padding:15px;}
+.mtc-fest{font-family:'Epilogue',sans-serif;font-size:14px;font-weight:800;margin-bottom:3px;}
+.mtc-meta{font-family:'DM Mono',monospace;font-size:11px;color:#aaa;margin-bottom:9px;}
+.mtc-right{width:95px;background:var(--d4);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px;}
+.mtc-qr{font-size:26px;}
+.mtc-code{font-family:'DM Mono',monospace;font-size:11px;color:#aaa;}
+
+/* ════════════════════════════════════════════
+   VENDOR INTERFACE (from v2, unchanged)
+════════════════════════════════════════════ */
+#iface-ven{background:var(--chalk);}
+.v-topbar{background:white;border-bottom:1px solid #e8e0d0;padding:0 22px;height:50px;display:flex;align-items:center;gap:16px;flex-shrink:0;}
+.v-logo{font-family:'Epilogue',sans-serif;font-weight:900;font-size:15px;color:var(--ink);}
+.v-logo span{color:var(--v);}
+.v-logo-sub{font-size:12px;font-weight:400;color:#888;margin-left:3px;}
+.v-nav{display:flex;gap:3px;flex:1;justify-content:center;}
+.v-nav-item{font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;padding:7px 15px;border-radius:7px;cursor:pointer;color:#555;transition:all .2s;display:flex;align-items:center;}
+.v-nav-item:hover{background:#f5f0e8;color:var(--ink);}
+.v-nav-item.on{background:var(--vl);color:var(--v);font-weight:600;}
+.v-spacer{flex:1;}
+.v-cta-btn{background:var(--v);color:white;border:none;padding:7px 16px;border-radius:7px;font-family:'Epilogue',sans-serif;font-weight:700;font-size:12px;cursor:pointer;}
+.v-user{display:flex;align-items:center;gap:7px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;color:#666;}
+.v-user-av{width:28px;height:28px;background:var(--v);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:white;font-family:'Epilogue',sans-serif;}
+.v-body{flex:1;overflow-y:auto;background:var(--chalk);}
+.v-screen{display:none;padding:24px;}
+.v-screen.on{display:block;}
+.v-pg-title{font-family:'Epilogue',sans-serif;font-size:22px;font-weight:900;color:var(--ink);margin-bottom:4px;}
+.v-pg-sub{font-family:'DM Mono',monospace;font-size:12px;color:#777;margin-bottom:20px;}
+.v-stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+.v-stat{background:white;border:1px solid #ede8de;border-radius:12px;padding:14px;}
+.v-stat-lbl{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:2px;color:#666;margin-bottom:6px;text-transform:uppercase;}
+.v-stat-val{font-family:'Epilogue',sans-serif;font-size:24px;font-weight:900;color:var(--v);}
+.v-stat-sub{font-family:'DM Mono',monospace;font-size:10px;color:#777;margin-top:3px;}
+.v-two{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.v-card{background:white;border:1px solid #ede8de;border-radius:14px;padding:18px;transition:box-shadow .2s;}
+.v-card:hover{box-shadow:0 4px 20px rgba(0,0,0,.07);}
+.v-card-title{font-family:'Epilogue',sans-serif;font-size:13px;font-weight:700;color:var(--ink);margin-bottom:13px;}
+.v-deal-row{display:flex;align-items:center;gap:10px;padding:11px;background:#faf7f2;border:1px solid #ede8de;border-radius:8px;margin-bottom:6px;}
+.v-di{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.v-dn{font-family:'Epilogue',sans-serif;font-size:13px;font-weight:700;color:var(--ink);}
+.v-dm{font-family:'DM Mono',monospace;font-size:10px;color:#666;margin-top:1px;}
+.v-da{font-family:'Epilogue',sans-serif;font-size:15px;font-weight:800;color:var(--v);}
+.vsp-acc{background:rgba(200,241,53,.15);color:#3d6400;font-family:'DM Mono',monospace;font-size:10px;font-weight:700;padding:3px 7px;border-radius:4px;}
+.vsp-pen{background:rgba(56,189,248,.15);color:#005588;font-family:'DM Mono',monospace;font-size:10px;font-weight:700;padding:3px 7px;border-radius:4px;}
+.vsp-rej{background:rgba(255,77,109,.15);color:#cc1144;font-family:'DM Mono',monospace;font-size:10px;font-weight:700;padding:3px 7px;border-radius:4px;}
+.fest-card-v{background:white;border:1px solid #ede8de;border-radius:12px;overflow:hidden;cursor:pointer;transition:box-shadow .2s,transform .2s;}
+.fest-card-v:hover{box-shadow:0 8px 24px rgba(0,0,0,.08);transform:translateY(-2px);}
+.fc-banner{height:70px;display:flex;align-items:center;justify-content:center;font-size:24px;}
+.fc-body{padding:12px;}
+.fc-name{font-family:'Epilogue',sans-serif;font-size:13px;font-weight:800;color:var(--ink);margin-bottom:2px;}
+.fc-meta{font-family:'DM Mono',monospace;font-size:10px;color:#666;margin-bottom:7px;}
+.fc-tags{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px;}
+.fc-tag{font-family:'DM Mono',monospace;font-size:10px;padding:3px 8px;border-radius:3px;}
+.v-out-btn{border:1px solid var(--v);color:var(--v);background:transparent;padding:7px 14px;border-radius:6px;font-family:'DM Mono',monospace;font-size:11px;font-weight:700;cursor:pointer;width:100%;transition:all .2s;}
+.v-out-btn:hover{background:var(--v);color:white;}
+
+/* ── ORGANIZER: BROWSE VENDORS & SPONSORS SCREEN ── */
+.browse-tabs{display:flex;gap:3px;background:var(--d3);border:1px solid var(--d4);border-radius:10px;padding:4px;margin-bottom:18px;width:fit-content;}
+.browse-tab{font-family:'DM Mono',monospace;font-size:11px;padding:8px 18px;border:none;background:transparent;color:#aaa;cursor:pointer;border-radius:7px;transition:all .2s;}
+.browse-tab.on{background:var(--v);color:white;font-weight:700;}
+.browse-panel{display:none;}
+.browse-panel.on{display:block;}
+.spon-browse-card{background:var(--d3);border:1px solid var(--d4);border-radius:12px;padding:14px;display:flex;align-items:center;gap:13px;margin-bottom:8px;transition:border-color .18s,transform .18s;cursor:pointer;}
+.spon-browse-card:hover{border-color:var(--v);transform:translateX(3px);}
+.spon-logo-big{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:white;flex-shrink:0;font-family:'Epilogue',sans-serif;}
+.spon-info{flex:1;}
+.spon-name{font-family:'Epilogue',sans-serif;font-size:14px;font-weight:800;margin-bottom:2px;}
+.spon-cat{font-family:'DM Mono',monospace;font-size:10px;color:#bbb;text-transform:uppercase;letter-spacing:1px;}
+.spon-tags-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px;}
+.spon-deal{text-align:right;flex-shrink:0;}
+.spon-amt{font-family:'Epilogue',sans-serif;font-size:16px;font-weight:900;color:var(--lm);}
+.spon-reach{font-family:'DM Mono',monospace;font-size:10px;color:#bbb;margin-top:2px;}
+.spon-invite-btn{background:var(--vl);color:var(--v);border:1px solid rgba(124,58,237,.3);padding:7px 14px;border-radius:7px;font-family:'DM Mono',monospace;font-size:10px;font-weight:700;cursor:pointer;margin-top:6px;transition:all .15s;}
+.spon-invite-btn:hover{background:var(--v);color:white;}
+
+/* ── STUDENT: ACCOUNT + VOL INVITES SCREENS ── */
+.s-acc-hero{background:linear-gradient(135deg,#003a52 0%,#1a0a3e 100%);border-radius:14px;padding:22px;margin-bottom:18px;display:flex;gap:14px;align-items:center;position:relative;overflow:hidden;}
+.s-acc-hero::after{content:'';position:absolute;right:-30px;top:-30px;width:150px;height:150px;background:rgba(56,189,248,.12);border-radius:50%;}
+.s-acc-av{width:56px;height:56px;background:linear-gradient(135deg,var(--sk),var(--v));border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:'Epilogue',sans-serif;font-size:20px;font-weight:900;flex-shrink:0;position:relative;}
+.s-acc-name{font-family:'Epilogue',sans-serif;font-size:20px;font-weight:900;margin-bottom:2px;position:relative;}
+.s-acc-role{font-family:'DM Mono',monospace;font-size:10px;color:var(--sk);margin-bottom:5px;position:relative;}
+.s-acc-college{font-size:12px;color:#aaa;position:relative;}
+.s-acc-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px;}
+.s-acc-section{background:var(--d3);border:1px solid var(--d4);border-radius:13px;padding:17px;}
+.s-acc-sec-title{font-family:'Epilogue',sans-serif;font-size:13px;font-weight:700;margin-bottom:12px;}
+.s-acc-field{margin-bottom:10px;}
+.s-acc-lbl{font-family:'DM Mono',monospace;font-size:11px;color:#bbb;letter-spacing:1px;text-transform:uppercase;margin-bottom:3px;}
+.s-acc-val{font-size:13px;color:var(--chalk);}
+.vol-invite-card{background:var(--d3);border:1px solid var(--d4);border-radius:13px;padding:16px;margin-bottom:10px;transition:border-color .18s;}
+.vol-invite-card:hover{border-color:var(--sk);}
+.vol-invite-card.new-invite{border-left:3px solid var(--sk);}
+.vi-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;}
+.vi-fest-ico{width:42px;height:42px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.vi-fest-name{font-family:'Epilogue',sans-serif;font-size:14px;font-weight:800;margin-bottom:2px;}
+.vi-fest-meta{font-family:'DM Mono',monospace;font-size:11px;color:#aaa;}
+.vi-role-badge{margin-left:auto;text-align:right;}
+.vi-details{background:#131313;border-radius:9px;padding:11px;margin-bottom:11px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.vi-detail-item{display:flex;flex-direction:column;gap:3px;}
+.vi-detail-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:#666;text-transform:uppercase;}
+.vi-detail-val{font-size:12px;color:#ccc;font-weight:500;}
+.vi-footer{display:flex;align-items:center;gap:8px;}
+.vi-desc{flex:1;font-size:11.5px;color:#888;line-height:1.5;}
+.btn-accept{background:var(--sk);color:var(--ink);border:none;padding:8px 18px;border-radius:7px;font-family:'DM Mono',monospace;font-size:11px;font-weight:700;cursor:pointer;transition:opacity .18s;}
+.btn-accept:hover{opacity:.85;}
+.btn-decline{background:var(--d4);color:#888;border:1px solid var(--d5);padding:8px 14px;border-radius:7px;font-family:'DM Mono',monospace;font-size:11px;cursor:pointer;transition:all .15s;}
+.btn-decline:hover{border-color:var(--cr);color:var(--cr);}
+.vi-new-dot{width:7px;height:7px;border-radius:50%;background:var(--sk);flex-shrink:0;}
+
+/* ── VENDOR: VIEW OFFERS SCREEN ── */
+.v-offer-card{background:white;border:1px solid #ede8de;border-radius:13px;padding:16px;margin-bottom:10px;transition:box-shadow .2s,transform .2s;}
+.v-offer-card:hover{box-shadow:0 6px 20px rgba(0,0,0,.07);transform:translateY(-1px);}
+.v-offer-card.v-offer-new{border-left:3px solid var(--v);}
+.voc-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px;}
+.voc-fest-ico{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.voc-fest-name{font-family:'Epilogue',sans-serif;font-size:15px;font-weight:800;color:var(--ink);margin-bottom:2px;}
+.voc-organizer{font-family:'DM Mono',monospace;font-size:11px;color:#888;}
+.voc-amount{margin-left:auto;text-align:right;}
+.voc-amt-val{font-family:'Epilogue',sans-serif;font-size:20px;font-weight:900;color:var(--v);}
+.voc-type{font-family:'DM Mono',monospace;font-size:10px;color:#888;margin-top:2px;}
+.voc-details{background:#faf7f2;border-radius:9px;padding:12px;margin-bottom:12px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.voc-det-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;color:#999;text-transform:uppercase;margin-bottom:3px;}
+.voc-det-val{font-family:'Epilogue',sans-serif;font-size:13px;font-weight:700;color:var(--ink);}
+.voc-perks{background:rgba(124,58,237,.06);border:1px solid rgba(124,58,237,.15);border-radius:8px;padding:11px;margin-bottom:12px;font-size:12px;color:#555;line-height:1.6;}
+.voc-perks-title{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--v);text-transform:uppercase;margin-bottom:5px;font-weight:700;}
+.voc-actions{display:flex;gap:8px;align-items:center;}
+.voc-accept-btn{background:var(--v);color:white;border:none;padding:9px 20px;border-radius:7px;font-family:'Epilogue',sans-serif;font-weight:700;font-size:12px;cursor:pointer;transition:opacity .18s;flex:1;}
+.voc-accept-btn:hover{opacity:.88;}
+.voc-counter-btn{background:transparent;color:var(--v);border:1.5px solid var(--v);padding:9px 14px;border-radius:7px;font-family:'Epilogue',sans-serif;font-weight:700;font-size:12px;cursor:pointer;transition:all .2s;}
+.voc-counter-btn:hover{background:var(--vl);}
+.voc-decline-btn{background:transparent;color:#aaa;border:1px solid #ede8de;padding:9px 14px;border-radius:7px;font-family:'Epilogue',sans-serif;font-size:12px;cursor:pointer;}
+.voc-new-tag{background:rgba(124,58,237,.1);color:var(--v);font-family:'DM Mono',monospace;font-size:9px;font-weight:700;padding:3px 8px;border-radius:4px;letter-spacing:1px;}
+.voc-status-bar{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;}
+.voc-stat-pill{background:white;border:1px solid #ede8de;border-radius:8px;padding:10px 16px;display:flex;flex-direction:column;gap:2px;}
+.voc-stat-pill-lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;color:#999;text-transform:uppercase;}
+.voc-stat-pill-val{font-family:'Epilogue',sans-serif;font-size:18px;font-weight:900;color:var(--v);}
+</style>
+</head>
+<body>
+
+<!-- CHROME -->
+<div class="chrome">
+  <div class="chrome-logo ef">fest<span>FLOW</span></div>
+  <div class="chrome-sep"></div>
+  <div class="chrome-lbl mono">Portal</div>
+  <div class="portal-sw">
+    <button class="ps-btn active org" id="btn-org" onclick="switchIface('org')">🎪 Organizer</button>
+    <button class="ps-btn stu" id="btn-stu" onclick="switchIface('stu')">🎓 Student</button>
+    <button class="ps-btn ven" id="btn-ven" onclick="switchIface('ven')">💼 Vendor</button>
+  </div>
+  <div class="chrome-sp"></div>
+  <div class="proto-tag mono">PROTOTYPE v7</div>
+</div>
+
+<!-- ══════════════════════════ ORGANIZER ══════════════════════════ -->
+<div class="iface active" id="iface-org">
+
+  <!-- TOPBAR -->
+  <div class="o-top">
+    <div class="o-logo ef">fest<span>FLOW</span></div>
+
+    <!-- Fest dropdown -->
+    <div class="fdrop" id="fdrop">
+      <div class="fdrop-btn" onclick="toggleFD()">
+        <div class="fdrop-dot" id="fdrop-dot" style="background:var(--lm)"></div>
+        <span class="fdrop-name mono" id="fdrop-lbl">TechFest VJTI '26</span>
+        <span class="fdrop-arr">▾</span>
+      </div>
+      <div class="fdrop-menu">
+        <div class="fopt active" id="fopt-techfest" onclick="selFest('techfest')">
+          <span class="fopt-ico">⚡</span><span class="fopt-name ef">TechFest VJTI '26</span>
+          <span class="fopt-badge" style="background:var(--ll);color:#5a8a00;">ACTIVE</span>
+        </div>
+        <div class="fopt" id="fopt-culturals" onclick="selFest('culturals')">
+          <span class="fopt-ico">🎭</span><span class="fopt-name ef">Culturals 2026</span>
+          <span class="fopt-badge" style="background:var(--sl);color:#0077aa;">PLANNING</span>
+        </div>
+        <div class="fopt" id="fopt-sports" onclick="selFest('sports')">
+          <span class="fopt-ico">🏆</span><span class="fopt-name ef">Sports Day 2026</span>
+          <span class="fopt-badge" style="background:var(--d4);color:var(--mid);">DONE</span>
+        </div>
+        <div style="border-top:1px solid var(--d4);margin-top:5px;padding-top:5px;">
+          <div class="fopt" onclick="showCreateModal();toggleFD()">
+            <span class="fopt-ico">✨</span><span class="fopt-name ef" style="color:var(--lm);">+ Create New Event</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="o-sp"></div>
+
+    <!-- Notification -->
+    <div class="notif-wrap" id="notif-wrap">
+      <div class="notif-btn" onclick="toggleNotif()">🔔<div class="notif-badge"></div></div>
+      <div class="notif-panel">
+        <div class="notif-hd ef">Notifications <span onclick="document.querySelectorAll('.notif-badge').forEach(b=>b.style.display='none')">Clear all</span></div>
+        <div class="notif-item"><div class="ni-dot" style="background:var(--cr)"></div><div class="ni-txt"><strong>Budget Alert:</strong> Catering exceeded by ₹8,000</div><div class="ni-time mono">2m</div></div>
+        <div class="notif-item"><div class="ni-dot" style="background:var(--lm)"></div><div class="ni-txt"><strong>New Offer:</strong> Zomato submitted ₹50,000 sponsorship</div><div class="ni-time mono">1h</div></div>
+        <div class="notif-item"><div class="ni-dot" style="background:var(--sk)"></div><div class="ni-txt"><strong>Ticket Milestone:</strong> 70% sold — promo push recommended</div><div class="ni-time mono">3h</div></div>
+        <div class="notif-item"><div class="ni-dot" style="background:var(--v)"></div><div class="ni-txt"><strong>Team:</strong> Logistics has 4 unassigned tasks</div><div class="ni-time mono">5h</div></div>
+        <div class="notif-item"><div class="ni-dot" style="background:var(--lm)"></div><div class="ni-txt"><strong>Volunteer Request:</strong> 3 new applications received</div><div class="ni-time mono">6h</div></div>
+      </div>
+    </div>
+
+    <!-- Avatar dropdown -->
+    <div class="avatar-wrap" id="avatar-wrap">
+      <div class="o-avatar" onclick="toggleAvatar()">AK</div>
+      <div class="avatar-menu">
+        <div class="av-info">
+          <div class="av-name ef">Aryan Kumar</div>
+          <div class="av-role mono">Organizer · VJTI Mumbai</div>
+        </div>
+        <div class="av-item" onclick="showAccount()">👤 My Account</div>
+        <div class="av-item">⚙️ Settings</div>
+        <div class="av-item">🔔 Notification Prefs</div>
+        <div style="border-top:1px solid var(--d4);margin:5px 0;"></div>
+        <div class="av-item danger">↩ Sign Out</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="o-body">
+    <!-- SIDEBAR -->
+    <div class="o-sidebar" id="o-sidebar">
+      <div class="sidebar-toggle">
+        <button class="toggle-btn" onclick="toggleSidebar()" id="toggle-btn" title="Collapse sidebar">☰</button>
+      </div>
+
+      <div class="nav-sec-lbl mono">Navigation</div>
+      <div class="nav-item on" id="nav-home" onclick="showHome()">
+        <span class="nav-ico">🏠</span><span class="nav-label">Home</span>
+      </div>
+      <div class="nav-item" id="nav-events" onclick="toggleEvSub(this)">
+        <span class="nav-ico">📋</span><span class="nav-label">My Events</span>
+        <span class="nav-arr" id="ev-arr">▾</span>
+      </div>
+      <div class="nav-sub" id="ev-sub">
+        <div class="nav-sub-item on" id="sub-techfest" onclick="openEvent('techfest',this)">
+          <div class="sub-dot" style="background:var(--lm)"></div><span class="sub-name">TechFest VJTI '26</span>
+        </div>
+        <div class="nav-sub-item" id="sub-culturals" onclick="openEvent('culturals',this)">
+          <div class="sub-dot" style="background:var(--sk)"></div><span class="sub-name">Culturals 2026</span>
+        </div>
+        <div class="nav-sub-item" id="sub-sports" onclick="openEvent('sports',this)">
+          <div class="sub-dot" style="background:var(--mid)"></div><span class="sub-name">Sports Day</span>
+        </div>
+      </div>
+
+      <div class="nav-sec-lbl mono" style="margin-top:6px;">Discovery</div>
+      <div class="nav-item" id="nav-browse" onclick="showBrowse()">
+        <span class="nav-ico">🏪</span><span class="nav-label">Vendors & Sponsors</span>
+      </div>
+
+      <div class="nav-sec-lbl mono" style="margin-top:6px;">Account</div>
+      <div class="nav-item" id="nav-account" onclick="showAccount()">
+        <span class="nav-ico">👤</span><span class="nav-label">My Account</span>
+      </div>
+
+      <div class="sidebar-foot">
+        <div class="nav-item" style="color:#777;font-size:12px;"><span class="nav-ico">↩</span><span class="nav-label">Sign out</span></div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="o-content">
+
+      <!-- ── HOME ── -->
+      <div class="o-screen on" id="screen-home">
+        <div class="pg-title ef">Hey Aryan, <span style="color:var(--v)">ready to build? 🔥</span></div>
+        <p class="pg-sub mono">Logged in as Organizer · VJTI Mumbai</p>
+        <div class="act-grid">
+          <div class="act-card ac-create">
+            <div class="ac-badge" style="background:var(--lm);color:var(--ink);">NEW</div>
+            <div class="ac-ico">✨</div>
+            <div class="ac-title ef">Create New Event</div>
+            <p class="ac-sub">Start fresh — set up event details, add day-wise schedule, budget, team, and open ticketing all in one place.</p>
+            <button class="btn-lime-full" style="font-size:13px;padding:9px 18px;" onclick="showCreateModal()">Start Creating →</button>
+          </div>
+          <div class="act-card ac-view">
+            <div class="ac-badge" style="background:var(--sk);color:var(--ink);">3 EVENTS</div>
+            <div class="ac-ico">📋</div>
+            <div class="ac-title ef">View Existing Events</div>
+            <p class="ac-sub">Manage active and past events — update schedules, track activity progress, and monitor all modules.</p>
+            <button class="btn-ghost-sm" onclick="openEvent('techfest',document.getElementById('sub-techfest'))">View Events →</button>
+          </div>
+        </div>
+        <div class="sec-title ef">Recent Events <span class="sec-link" onclick="openEvent('techfest',document.getElementById('sub-techfest'))">View all →</span></div>
+        <div class="ev-row" onclick="openEvent('techfest',document.getElementById('sub-techfest'))">
+          <div class="ev-ico" style="background:linear-gradient(135deg,#1a0a3e,#2d1260)">⚡</div>
+          <div><div class="ev-name ef">TechFest VJTI '26</div><div class="ev-meta mono">May 22–24, 2026 · 3 Days · Mumbai</div></div>
+          <div class="ev-sp"></div>
+          <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--lm);margin-right:10px;">₹4.2L</span>
+          <span class="sbadge" style="background:var(--ll);color:#5a8a00;">ACTIVE</span>
+        </div>
+        <div class="ev-row" onclick="openEvent('culturals',document.getElementById('sub-culturals'))">
+          <div class="ev-ico" style="background:linear-gradient(135deg,#003a52,#001a30)">🎭</div>
+          <div><div class="ev-name ef">Culturals 2026</div><div class="ev-meta mono">Jun 10–11, 2026 · 2 Days · Mumbai</div></div>
+          <div class="ev-sp"></div>
+          <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--sk);margin-right:10px;">₹1.8L</span>
+          <span class="sbadge" style="background:var(--sl);color:#0077aa;">PLANNING</span>
+        </div>
+        <div class="ev-row" onclick="openEvent('sports',document.getElementById('sub-sports'))">
+          <div class="ev-ico" style="background:linear-gradient(135deg,#1a2200,#2d3a00)">🏆</div>
+          <div><div class="ev-name ef">Sports Day 2026</div><div class="ev-meta mono">Feb 15, 2026 · 1 Day · Mumbai</div></div>
+          <div class="ev-sp"></div>
+          <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--mid);margin-right:10px;">₹80K</span>
+          <span class="sbadge" style="background:var(--d4);color:var(--mid);">COMPLETED</span>
+        </div>
+      </div>
+
+      <!-- ── EVENT DETAIL ── -->
+      <div class="o-screen" id="screen-event">
+        <div style="margin-bottom:12px;"><button class="btn-ghost-sm" onclick="showHome()">← Back to Home</button></div>
+        <div class="event-hdr">
+          <div class="ehdr-ico" id="ehdr-ico" style="background:linear-gradient(135deg,#1a0a3e,#2d1260)">⚡</div>
+          <div>
+            <div class="ehdr-name ef" id="ehdr-name">TechFest VJTI '26</div>
+            <div class="ehdr-meta mono" id="ehdr-meta">May 22–24, 2026 · VJTI Auditorium, Mumbai · 2,000 expected</div>
+            <div class="ehdr-tags" id="ehdr-tags">
+              <span class="sbadge" style="background:var(--ll);color:#5a8a00;">ACTIVE</span>
+              <span class="sbadge" style="background:var(--sl);color:#0077aa;margin-left:5px;">TECHNICAL</span>
+              <span class="sbadge" style="background:var(--vl);color:var(--v);margin-left:5px;">840/1200 TICKETS</span>
+            </div>
+          </div>
+          <div class="ehdr-sp"></div>
+          <div class="ehdr-actions">
+            <button class="btn-lime-full" style="padding:8px 15px;font-size:12px;" onclick="openActModal()">+ Add Activity</button>
+            <button class="btn-ghost-sm" style="padding:7px 13px;font-size:12px;">Edit Event</button>
+          </div>
+        </div>
+
+        <div class="mod-tabs">
+          <button class="mod-tab on" onclick="showMod('overview',this)">📊 Overview</button>
+          <button class="mod-tab" onclick="showMod('activities',this)">📅 Activities</button>
+          <button class="mod-tab" onclick="showMod('budget',this)">💰 Budget</button>
+          <button class="mod-tab" onclick="showMod('tickets',this)">🎟️ Ticketing</button>
+          <button class="mod-tab" onclick="showMod('sponsors',this)">🤝 Sponsors</button>
+          <button class="mod-tab" onclick="showMod('vsurf',this)">🏪 Browse Vendors</button>
+          <button class="mod-tab" onclick="showMod('team',this)">👥 Team</button>
+        </div>
+
+        <!-- OVERVIEW -->
+        <div class="mod-panel on" id="mp-overview">
+          <div class="c4">
+            <div class="stat-card"><div class="stat-lbl mono">Total Budget</div><div class="stat-val ef" style="color:var(--lm)">₹4.2L</div><div class="stat-sub mono" style="color:#3a5a00">↑ ₹60k from sponsors</div></div>
+            <div class="stat-card"><div class="stat-lbl mono">Tickets Sold</div><div class="stat-val ef" style="color:var(--sk)">840</div><div class="stat-sub mono" style="color:#005577">of 1,200 total</div></div>
+            <div class="stat-card"><div class="stat-lbl mono">Active Sponsors</div><div class="stat-val ef" style="color:var(--v)">7</div><div class="stat-sub mono" style="color:#4a2a9a">3 pending</div></div>
+            <div class="stat-card"><div class="stat-lbl mono">Deadlines Today</div><div class="stat-val ef" style="color:var(--cr)">3</div><div class="stat-sub mono" style="color:#880022">1 overdue!</div></div>
+          </div>
+          <div class="c2">
+            <div class="card">
+              <div class="card-title">Live Activity <span style="font-family:'DM Mono',monospace;font-size:10px;color:#aaa;font-weight:400;">LAST 24HRS</span></div>
+              <div class="alert-item"><div class="adot" style="background:var(--cr)"></div><div class="atxt"><strong style="color:var(--cr)">Budget Alert:</strong> Catering exceeded by ₹8,000</div><div class="atime mono">2m</div></div>
+              <div class="alert-item"><div class="adot" style="background:var(--lm)"></div><div class="atxt"><strong style="color:var(--lm)">New Offer:</strong> Zomato submitted ₹50,000 sponsorship</div><div class="atime mono">1h</div></div>
+              <div class="alert-item"><div class="adot" style="background:var(--sk)"></div><div class="atxt"><strong style="color:var(--sk)">Ticket Milestone:</strong> 70% sold — promo push recommended</div><div class="atime mono">3h</div></div>
+              <div class="alert-item"><div class="adot" style="background:var(--v)"></div><div class="atxt"><strong style="color:var(--v)">Team:</strong> Logistics has 4 unassigned tasks</div><div class="atime mono">5h</div></div>
+              <div style="margin-top:12px;"><div class="pills-row"><span class="pill" style="background:var(--vl);color:var(--v);">7 Sponsors Active</span><span class="pill" style="background:var(--ll);color:#5a8a00;">Promo Live ✓</span><span class="pill" style="background:var(--sl);color:#0077aa;">32 Volunteers</span></div></div>
+            </div>
+            <div class="card">
+              <div class="card-title">Budget Split</div>
+              <div class="donut-wrap">
+                <svg width="106" height="106" viewBox="0 0 110 110">
+                  <circle cx="55" cy="55" r="40" fill="none" stroke="#1a1a1a" stroke-width="18"/>
+                  <circle cx="55" cy="55" r="40" fill="none" stroke="#7C3AED" stroke-width="18" stroke-dasharray="75.4 175.9" stroke-dashoffset="0" transform="rotate(-90 55 55)"/>
+                  <circle cx="55" cy="55" r="40" fill="none" stroke="#38BDF8" stroke-width="18" stroke-dasharray="44 207.3" stroke-dashoffset="-75.4" transform="rotate(-90 55 55)"/>
+                  <circle cx="55" cy="55" r="40" fill="none" stroke="#C8F135" stroke-width="18" stroke-dasharray="30 221.3" stroke-dashoffset="-119.4" transform="rotate(-90 55 55)"/>
+                  <circle cx="55" cy="55" r="40" fill="none" stroke="#FF4D6D" stroke-width="18" stroke-dasharray="20 231.3" stroke-dashoffset="-149.4" transform="rotate(-90 55 55)"/>
+                  <text x="55" y="52" text-anchor="middle" fill="#F5F0E8" font-size="11" font-weight="700" font-family="Epilogue">₹4.2L</text>
+                  <text x="55" y="64" text-anchor="middle" fill="#555" font-size="8" font-family="DM Mono">TOTAL</text>
+                </svg>
+                <div class="dl">
+                  <div class="dl-item"><div class="dl-sq" style="background:var(--v)"></div><div class="dl-name">Logistics</div><div class="dl-pct" style="color:var(--v)">30%</div></div>
+                  <div class="dl-item"><div class="dl-sq" style="background:var(--sk)"></div><div class="dl-name">Marketing</div><div class="dl-pct" style="color:var(--sk)">18%</div></div>
+                  <div class="dl-item"><div class="dl-sq" style="background:var(--lm)"></div><div class="dl-name">Catering</div><div class="dl-pct" style="color:var(--lm)">12%</div></div>
+                  <div class="dl-item"><div class="dl-sq" style="background:var(--cr)"></div><div class="dl-name">Decor</div><div class="dl-pct" style="color:var(--cr)">8%</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ACTIVITIES -->
+        <div class="mod-panel" id="mp-activities">
+          <div class="day-tabs" id="day-tabs-row">
+            <button class="day-tab on" onclick="switchDay(0,this)">Day 1 — May 22</button>
+            <button class="day-tab" onclick="switchDay(1,this)">Day 2 — May 23</button>
+            <button class="day-tab" onclick="switchDay(2,this)">Day 3 — May 24</button>
+          </div>
+          <div id="dp-0">
+            <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--mid);margin-bottom:12px;">SATURDAY, MAY 22</div>
+            <div class="act-list">
+              <div class="act-item"><div class="act-left"><div class="act-time mono">08:00<br>AM</div><div class="act-dot done"></div><div class="act-line"></div></div><div class="act-card done-card"><div class="act-top"><div class="act-title ef">Registration & Check-in</div><div class="act-dur mono">2 hrs</div><span class="sbadge" style="background:var(--d4);color:var(--mid);">DONE ✓</span></div><div class="act-desc">Participant registration, ID verification, kit distribution. Volunteers at 4 entry gates.</div><div class="act-footer"><span class="act-venue mono">📍 Main Gate & Foyer</span><span class="act-team mono">👥 Logistics Team</span></div></div></div>
+              <div class="act-item"><div class="act-left"><div class="act-time mono">10:00<br>AM</div><div class="act-dot done"></div><div class="act-line"></div></div><div class="act-card done-card"><div class="act-top"><div class="act-title ef">Inaugural Ceremony</div><div class="act-dur mono">1.5 hrs</div><span class="sbadge" style="background:var(--d4);color:var(--mid);">DONE ✓</span></div><div class="act-desc">Chief Guest address, lamp lighting, student performances.</div><div class="act-footer"><span class="act-venue mono">📍 Main Auditorium</span><span class="act-team mono">👥 Core Committee</span></div></div></div>
+              <div class="act-item"><div class="act-left"><div class="act-time mono">12:00<br>PM</div><div class="act-dot live"></div><div class="act-line"></div></div><div class="act-card live-card"><div class="act-top"><div class="act-title ef">Hackathon — Round 1</div><div class="act-dur mono">4 hrs</div><span class="sbadge" style="background:var(--ll);color:#5a8a00;">LIVE 🟢</span></div><div class="act-desc">24-hour hackathon kicks off. Teams present problem statements. Theme: Sustainability & AI.</div><div class="act-footer"><span class="act-venue mono">📍 Computer Lab Block A</span><span class="act-team mono">👥 Tech Committee</span><div class="act-tags-r"><span class="sbadge" style="background:var(--vl);color:var(--v);">COMPETITION</span><span class="sbadge" style="background:var(--ll);color:#5a8a00;margin-left:4px;">120 TEAMS</span></div></div></div></div>
+              <div class="act-item"><div class="act-left"><div class="act-time mono">02:00<br>PM</div><div class="act-dot"></div><div class="act-line"></div></div><div class="act-card"><div class="act-top"><div class="act-title ef">Paper Presentation — Prelims</div><div class="act-dur mono">3 hrs</div><span class="sbadge" style="background:var(--sl);color:#0077aa;">UPCOMING</span></div><div class="act-desc">Technical paper presentations in 3 tracks: AI/ML, Robotics, Web3. Top 10 qualify for Day 2.</div><div class="act-footer"><span class="act-venue mono">📍 Seminar Halls 1, 2 & 3</span><span class="act-team mono">👥 Academic Committee</span></div></div></div>
+              <div class="act-item"><div class="act-left"><div class="act-time mono">06:00<br>PM</div><div class="act-dot"></div><div class="act-line"></div></div><div class="act-card"><div class="act-top"><div class="act-title ef">Sponsor Showcase & Stalls</div><div class="act-dur mono">2 hrs</div><span class="sbadge" style="background:var(--sl);color:#0077aa;">UPCOMING</span></div><div class="act-desc">Brand activations, product demos, giveaways. boAt, Zomato, Swiggy stalls open.</div><div class="act-footer"><span class="act-venue mono">📍 College Grounds</span><span class="act-team mono">👥 Sponsorship Team</span></div></div></div>
+              <div class="act-item"><div class="act-left"><div class="act-time mono">08:00<br>PM</div><div class="act-dot"></div><div class="act-line" style="background:transparent"></div></div><div class="act-card"><div class="act-top"><div class="act-title ef">Evening Cultural Performance</div><div class="act-dur mono">2.5 hrs</div><span class="sbadge" style="background:var(--sl);color:#0077aa;">UPCOMING</span></div><div class="act-desc">DJ night and student band performances. Guest artist TBA. Open to all ticket holders.</div><div class="act-footer"><span class="act-venue mono">📍 Open Air Theatre</span><span class="act-team mono">👥 Cultural Committee</span></div></div></div>
+            </div>
+            <button class="add-act-btn" onclick="openActModal()">+ Add Activity to Day 1</button>
+          </div>
+          <div id="dp-1" style="display:none">
+            <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--mid);margin-bottom:12px;">SUNDAY, MAY 23</div>
+            <div class="act-list">
+              <div class="act-item"><div class="act-left"><div class="act-time mono">09:00<br>AM</div><div class="act-dot"></div><div class="act-line"></div></div><div class="act-card"><div class="act-top"><div class="act-title ef">Hackathon — Mid Review</div><div class="act-dur mono">2 hrs</div><span class="sbadge" style="background:var(--sl);color:#0077aa;">UPCOMING</span></div><div class="act-desc">Judges review hackathon progress. Teams present interim solutions and get feedback.</div><div class="act-footer"><span class="act-venue mono">📍 Computer Lab Block A</span><span class="act-team mono">👥 Tech Committee</span></div></div></div>
+              <div class="act-item"><div class="act-left"><div class="act-time mono">11:00<br>AM</div><div class="act-dot"></div><div class="act-line"></div></div><div class="act-card"><div class="act-top"><div class="act-title ef">Paper Presentation — Finals</div><div class="act-dur mono">3 hrs</div><span class="sbadge" style="background:var(--sl);color:#0077aa;">UPCOMING</span></div><div class="act-desc">Top 10 teams from prelims present their research to the final judging panel.</div><div class="act-footer"><span class="act-venue mono">📍 Main Auditorium</span><span class="act-team mono">👥 Academic Committee</span></div></div></div>
+              <div class="act-item"><div class="act-left"><div class="act-time mono">07:00<br>PM</div><div class="act-dot"></div><div class="act-line" style="background:transparent"></div></div><div class="act-card"><div class="act-top"><div class="act-title ef">Battle of Bands</div><div class="act-dur mono">3 hrs</div><span class="sbadge" style="background:var(--sl);color:#0077aa;">UPCOMING</span></div><div class="act-desc">Inter-college music competition — 8 bands compete. Audience voting + judges decide winner.</div><div class="act-footer"><span class="act-venue mono">📍 Open Air Theatre</span><span class="act-team mono">👥 Cultural Committee</span></div></div></div>
+            </div>
+            <button class="add-act-btn" onclick="openActModal()">+ Add Activity to Day 2</button>
+          </div>
+          <div id="dp-2" style="display:none">
+            <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--mid);margin-bottom:12px;">MONDAY, MAY 24</div>
+            <div class="act-list">
+              <div class="act-item"><div class="act-left"><div class="act-time mono">10:00<br>AM</div><div class="act-dot"></div><div class="act-line"></div></div><div class="act-card"><div class="act-top"><div class="act-title ef">Hackathon — Final Pitches</div><div class="act-dur mono">3 hrs</div><span class="sbadge" style="background:var(--sl);color:#0077aa;">UPCOMING</span></div><div class="act-desc">Top 20 teams pitch final solutions. Prize: ₹1L + incubation opportunity.</div><div class="act-footer"><span class="act-venue mono">📍 Main Auditorium</span><span class="act-team mono">👥 Tech Committee</span></div></div></div>
+              <div class="act-item"><div class="act-left"><div class="act-time mono">05:00<br>PM</div><div class="act-dot"></div><div class="act-line" style="background:transparent"></div></div><div class="act-card"><div class="act-top"><div class="act-title ef">Closing Ceremony & Farewell</div><div class="act-dur mono">1.5 hrs</div><span class="sbadge" style="background:var(--sl);color:#0077aa;">UPCOMING</span></div><div class="act-desc">Thank you addresses, sponsor acknowledgements, official closing. Photo sessions.</div><div class="act-footer"><span class="act-venue mono">📍 College Grounds</span><span class="act-team mono">👥 Core Committee</span></div></div></div>
+            </div>
+            <button class="add-act-btn" onclick="openActModal()">+ Add Activity to Day 3</button>
+          </div>
+        </div>
+
+        <!-- BUDGET -->
+        <div class="mod-panel" id="mp-budget">
+          <div class="c3"><div class="stat-card"><div class="stat-lbl mono">Total Budget</div><div class="stat-val ef" style="color:var(--chalk)">₹4,20,000</div></div><div class="stat-card"><div class="stat-lbl mono">Spent So Far</div><div class="stat-val ef" style="color:var(--cr)">₹1,80,000</div><div class="stat-sub mono" style="color:#880022">43% used</div></div><div class="stat-card"><div class="stat-lbl mono">Remaining</div><div class="stat-val ef" style="color:var(--lm)">₹2,40,000</div><div class="stat-sub mono" style="color:#3a5a00">57% left</div></div></div>
+          <div class="c2">
+            <div class="card">
+              <div class="card-title">Category Breakdown</div>
+              <div class="bbar"><div class="bbar-lbl"><span class="bbar-cat">🚚 Logistics</span><span class="bbar-amt mono">₹58k / ₹80k</span></div><div class="bbar-track"><div class="bbar-fill" style="width:72%;background:var(--v)"></div></div></div>
+              <div class="bbar"><div class="bbar-lbl"><span class="bbar-cat">📣 Marketing</span><span class="bbar-amt mono">₹32k / ₹60k</span></div><div class="bbar-track"><div class="bbar-fill" style="width:53%;background:var(--sk)"></div></div></div>
+              <div class="bbar"><div class="bbar-lbl"><span class="bbar-cat" style="color:var(--cr)">🍽️ Catering ⚠</span><span class="bbar-amt mono" style="color:var(--cr)">₹58k / ₹50k</span></div><div class="bbar-track"><div class="bbar-fill" style="width:100%;background:var(--cr)"></div></div></div>
+              <div class="bbar"><div class="bbar-lbl"><span class="bbar-cat">🎨 Decor</span><span class="bbar-amt mono">₹18k / ₹40k</span></div><div class="bbar-track"><div class="bbar-fill" style="width:45%;background:var(--lm)"></div></div></div>
+              <div class="bbar"><div class="bbar-lbl"><span class="bbar-cat">🎤 Artists</span><span class="bbar-amt mono">₹14k / ₹80k</span></div><div class="bbar-track"><div class="bbar-fill" style="width:17%;background:var(--mid)"></div></div></div>
+            </div>
+            <div class="card">
+              <div class="card-title">Recent Expenses</div>
+              <div class="exp-row"><span class="exp-cat" style="background:var(--cl);color:var(--cr)">CATERING</span><span style="flex:1;color:#aaa;font-size:11px;">Buffet booking — Annapurna</span><span class="mono" style="font-size:12px;font-weight:700;">₹28,000</span></div>
+              <div class="exp-row"><span class="exp-cat" style="background:var(--vl);color:var(--v)">LOGISTICS</span><span style="flex:1;color:#aaa;font-size:11px;">Stage setup — Pro Events</span><span class="mono" style="font-size:12px;font-weight:700;">₹15,000</span></div>
+              <div class="exp-row"><span class="exp-cat" style="background:var(--sl);color:var(--sk)">MARKETING</span><span style="flex:1;color:#aaa;font-size:11px;">Instagram reels shoot</span><span class="mono" style="font-size:12px;font-weight:700;">₹8,000</span></div>
+              <div class="exp-row"><span class="exp-cat" style="background:var(--ll);color:#5a8a00">DECOR</span><span style="flex:1;color:#aaa;font-size:11px;">LED panels rental — 2 days</span><span class="mono" style="font-size:12px;font-weight:700;">₹12,000</span></div>
+              <div style="margin-top:11px;display:flex;gap:7px;"><button class="btn-prim" style="flex:1;" onclick="openExpModal()">+ Add Expense</button><button class="btn-ghost-sm" style="padding:9px 13px;">Export CSV</button></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TICKETS — promo channels & reach REMOVED -->
+        <div class="mod-panel" id="mp-tickets">
+          <div class="c4"><div class="stat-card"><div class="stat-lbl mono">Total Sold</div><div class="stat-val ef" style="color:var(--lm)">840</div></div><div class="stat-card"><div class="stat-lbl mono">Revenue</div><div class="stat-val ef" style="color:var(--sk)">₹2.94L</div></div><div class="stat-card"><div class="stat-lbl mono">Remaining</div><div class="stat-val ef" style="color:var(--chalk)">360</div></div><div class="stat-card"><div class="stat-lbl mono">Days to Fest</div><div class="stat-val ef" style="color:var(--v)">14</div></div></div>
+          <div class="card">
+            <div class="card-title">Ticket Tiers</div>
+            <div class="tier-card"><div class="tier-ico" style="background:var(--cl)">🔥</div><div class="tier-info"><div class="tier-name ef">VIP Pass</div><div class="tier-price mono" style="color:var(--cr)">₹799 / ticket</div></div><div class="tier-prog"><div class="tier-cnt mono">80 / 100 sold</div><div class="tbar"><div class="tbar-fill" style="width:80%;background:var(--cr)"></div></div></div></div>
+            <div class="tier-card"><div class="tier-ico" style="background:var(--vl)">⭐</div><div class="tier-info"><div class="tier-name ef">Standard Pass</div><div class="tier-price mono" style="color:var(--v)">₹399 / ticket</div></div><div class="tier-prog"><div class="tier-cnt mono">560 / 700 sold</div><div class="tbar"><div class="tbar-fill" style="width:80%;background:var(--v)"></div></div></div></div>
+            <div class="tier-card"><div class="tier-ico" style="background:var(--ll)">🎫</div><div class="tier-info"><div class="tier-name ef">Day Pass</div><div class="tier-price mono" style="color:#5a8a00">₹149 / ticket</div></div><div class="tier-prog"><div class="tier-cnt mono">200 / 400 sold</div><div class="tbar"><div class="tbar-fill" style="width:50%;background:var(--lm)"></div></div></div></div>
+            <button class="btn-prim" style="margin-top:9px;width:100%;">🔗 Generate Promo Link / QR</button>
+          </div>
+        </div>
+
+        <!-- SPONSORS -->
+        <div class="mod-panel" id="mp-sponsors">
+          <div style="display:flex;gap:7px;margin-bottom:14px;align-items:center;"><div style="flex:1;background:var(--d3);border:1px solid var(--d4);border-radius:8px;padding:9px 12px;font-family:'DM Mono',monospace;font-size:11px;color:#aaa;">🔍 Search vendors, brands...</div><button class="btn-ghost-sm">Filter ▾</button><button class="btn-prim" style="padding:9px 15px;font-size:12px;">+ Invite Brand</button></div>
+          <div class="card-title" style="margin-bottom:10px;">New Offers Received</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-bottom:16px;">
+            <div class="vendor-card"><div class="vc-top"><div class="vc-logo" style="background:#ff6b00">Z</div><div><div class="vc-name ef">Zomato</div><div class="vc-cat mono">FOOD TECH</div></div></div><div class="vc-offer ef">₹50,000 <span>Sponsorship</span></div><div class="vc-btns"><button class="btn-acc">✓ Accept</button><button class="btn-vsm">View</button></div></div>
+            <div class="vendor-card"><div class="vc-top"><div class="vc-logo" style="background:#0070f3">B</div><div><div class="vc-name ef">boAt Audio</div><div class="vc-cat mono">ELECTRONICS</div></div></div><div class="vc-offer ef">₹80,000 <span>Title Sponsor</span></div><div class="vc-btns"><button class="btn-acc">✓ Accept</button><button class="btn-vsm">View</button></div></div>
+            <div class="vendor-card"><div class="vc-top"><div class="vc-logo" style="background:#00aa44">S</div><div><div class="vc-name ef">Swiggy</div><div class="vc-cat mono">FOOD DELIVERY</div></div></div><div class="vc-offer ef">₹35,000 <span>Co-Sponsor</span></div><div class="vc-btns"><button class="btn-acc">✓ Accept</button><button class="btn-vsm">View</button></div></div>
+          </div>
+          <div class="card-title" style="margin-bottom:9px;">Active Sponsors</div>
+          <div class="sp-row"><span class="exp-cat" style="background:var(--ll);color:#5a8a00">GOLD</span><span class="ef" style="font-weight:700;flex:1;font-size:13px;">boAt Audio</span><span class="mono" style="font-size:12px;color:var(--lm);">₹80,000</span><span class="sp-acc-pill" style="margin-left:9px;">CONFIRMED</span></div>
+          <div class="sp-row"><span class="exp-cat" style="background:var(--sl);color:#0077aa">SILVER</span><span class="ef" style="font-weight:700;flex:1;font-size:13px;">Zomato</span><span class="mono" style="font-size:12px;color:var(--sk);">₹50,000</span><span class="sp-acc-pill" style="margin-left:9px;">CONFIRMED</span></div>
+          <div class="sp-row"><span class="exp-cat" style="background:var(--d4);color:var(--mid)">BRONZE</span><span class="ef" style="font-weight:700;flex:1;font-size:13px;">Swiggy</span><span class="mono" style="font-size:12px;color:#888;">₹35,000</span><span class="sp-pen-pill" style="margin-left:9px;">PENDING</span></div>
+        </div>
+
+        <!-- BROWSE VENDORS (new!) -->
+        <div class="mod-panel" id="mp-vsurf">
+          <div class="vsurf-filter">
+            <div class="vsurf-search"><span style="font-size:13px;color:var(--mid);">🔍</span><input placeholder="Search vendors by name, city, service..."></div>
+            <select style="background:var(--d3);border:1px solid var(--d4);color:var(--chalk);font-family:'DM Mono',monospace;font-size:10px;padding:9px 11px;border-radius:8px;cursor:pointer;outline:none;"><option>Any City</option><option>Mumbai</option><option>Pune</option><option>Delhi</option></select>
+            <select style="background:var(--d3);border:1px solid var(--d4);color:var(--chalk);font-family:'DM Mono',monospace;font-size:10px;padding:9px 11px;border-radius:8px;cursor:pointer;outline:none;"><option>Sort: Rating</option><option>Sort: Price ↑</option><option>Sort: Price ↓</option></select>
+          </div>
+          <div class="vsurf-cats">
+            <button class="vcat-btn on" onclick="vcatFilter(this)">All</button>
+            <button class="vcat-btn" onclick="vcatFilter(this)">🍽️ Catering</button>
+            <button class="vcat-btn" onclick="vcatFilter(this)">🔊 AV & Sound</button>
+            <button class="vcat-btn" onclick="vcatFilter(this)">💡 Lighting</button>
+            <button class="vcat-btn" onclick="vcatFilter(this)">🎨 Decoration</button>
+            <button class="vcat-btn" onclick="vcatFilter(this)">🔒 Security</button>
+            <button class="vcat-btn" onclick="vcatFilter(this)">📸 Photography</button>
+            <button class="vcat-btn" onclick="vcatFilter(this)">🚐 Transport</button>
+          </div>
+          <div class="vsurf-grid">
+            <div class="vsurf-card"><div class="vsurf-banner" style="background:linear-gradient(135deg,#1a0005,#3a0010)">🍽️<div class="vsurf-rating">⭐ 4.8</div></div><div class="vsurf-body"><div class="vsurf-name ef">Annapurna Caterers</div><div class="vsurf-cat mono">Catering · Mumbai</div><div class="vsurf-tags"><span class="vsurf-tag" style="background:var(--cl);color:var(--cr)">CATERING</span><span class="vsurf-tag" style="background:var(--ll);color:#5a8a00;margin-left:4px;">TOP RATED</span></div><div class="vsurf-price">₹180/plate <span>onwards</span></div><div class="vsurf-btns"><button class="btn-select" id="vs1" onclick="toggleSelect(this)">+ Select</button><button class="btn-info">Details</button></div></div></div>
+            <div class="vsurf-card"><div class="vsurf-banner" style="background:linear-gradient(135deg,#003a52,#001a30)">🔊<div class="vsurf-rating">⭐ 4.6</div></div><div class="vsurf-body"><div class="vsurf-name ef">SoundWave Pro</div><div class="vsurf-cat mono">AV & Sound · Mumbai</div><div class="vsurf-tags"><span class="vsurf-tag" style="background:var(--sl);color:#0077aa">AV & SOUND</span></div><div class="vsurf-price">₹25,000 <span>/ day</span></div><div class="vsurf-btns"><button class="btn-select" id="vs2" onclick="toggleSelect(this)">+ Select</button><button class="btn-info">Details</button></div></div></div>
+            <div class="vsurf-card"><div class="vsurf-banner" style="background:linear-gradient(135deg,#1a2200,#2d3a00)">💡<div class="vsurf-rating">⭐ 4.7</div></div><div class="vsurf-body"><div class="vsurf-name ef">Lumina Lighting</div><div class="vsurf-cat mono">Lighting · Mumbai</div><div class="vsurf-tags"><span class="vsurf-tag" style="background:var(--ll);color:#5a8a00">LIGHTING</span></div><div class="vsurf-price">₹18,000 <span>/ day</span></div><div class="vsurf-btns"><button class="btn-select" id="vs3" onclick="toggleSelect(this)">+ Select</button><button class="btn-info">Details</button></div></div></div>
+            <div class="vsurf-card"><div class="vsurf-banner" style="background:linear-gradient(135deg,#1a0a3e,#2d1260)">🎨<div class="vsurf-rating">⭐ 4.5</div></div><div class="vsurf-body"><div class="vsurf-name ef">Decor Dreams</div><div class="vsurf-cat mono">Decoration · Mumbai</div><div class="vsurf-tags"><span class="vsurf-tag" style="background:var(--vl);color:var(--v)">DECORATION</span></div><div class="vsurf-price">₹35,000 <span>package</span></div><div class="vsurf-btns"><button class="btn-select" id="vs4" onclick="toggleSelect(this)">+ Select</button><button class="btn-info">Details</button></div></div></div>
+            <div class="vsurf-card"><div class="vsurf-banner" style="background:linear-gradient(135deg,#2a0010,#4a0025)">🔒<div class="vsurf-rating">⭐ 4.9</div></div><div class="vsurf-body"><div class="vsurf-name ef">SafeGuard Security</div><div class="vsurf-cat mono">Security · Mumbai</div><div class="vsurf-tags"><span class="vsurf-tag" style="background:var(--cl);color:var(--cr)">SECURITY</span><span class="vsurf-tag" style="background:var(--ll);color:#5a8a00;margin-left:4px;">VERIFIED ✓</span></div><div class="vsurf-price">₹8,000 <span>/ day</span></div><div class="vsurf-btns"><button class="btn-select" id="vs5" onclick="toggleSelect(this)">+ Select</button><button class="btn-info">Details</button></div></div></div>
+            <div class="vsurf-card"><div class="vsurf-banner" style="background:linear-gradient(135deg,#003a52,#001a30)">📸<div class="vsurf-rating">⭐ 4.7</div></div><div class="vsurf-body"><div class="vsurf-name ef">SnapFrame Studios</div><div class="vsurf-cat mono">Photography · Mumbai</div><div class="vsurf-tags"><span class="vsurf-tag" style="background:var(--sl);color:#0077aa">PHOTOGRAPHY</span></div><div class="vsurf-price">₹15,000 <span>/ day</span></div><div class="vsurf-btns"><button class="btn-select" id="vs6" onclick="toggleSelect(this)">+ Select</button><button class="btn-info">Details</button></div></div></div>
+            <div class="vsurf-card"><div class="vsurf-banner" style="background:linear-gradient(135deg,#1a2200,#2d3a00)">🍕<div class="vsurf-rating">⭐ 4.4</div></div><div class="vsurf-body"><div class="vsurf-name ef">Street Bites Co.</div><div class="vsurf-cat mono">Food Stalls · Mumbai</div><div class="vsurf-tags"><span class="vsurf-tag" style="background:var(--cl);color:var(--cr)">CATERING</span></div><div class="vsurf-price">₹5,000 <span>stall/day</span></div><div class="vsurf-btns"><button class="btn-select" id="vs7" onclick="toggleSelect(this)">+ Select</button><button class="btn-info">Details</button></div></div></div>
+            <div class="vsurf-card"><div class="vsurf-banner" style="background:linear-gradient(135deg,#1a0a3e,#0a0020)">🚐<div class="vsurf-rating">⭐ 4.3</div></div><div class="vsurf-body"><div class="vsurf-name ef">SwiftMove Logistics</div><div class="vsurf-cat mono">Transport · Mumbai</div><div class="vsurf-tags"><span class="vsurf-tag" style="background:var(--d4);color:var(--mid)">TRANSPORT</span></div><div class="vsurf-price">₹6,000 <span>/ vehicle</span></div><div class="vsurf-btns"><button class="btn-select" id="vs8" onclick="toggleSelect(this)">+ Select</button><button class="btn-info">Details</button></div></div></div>
+            <div class="vsurf-card"><div class="vsurf-banner" style="background:linear-gradient(135deg,#003a52,#001a30)">🎤<div class="vsurf-rating">⭐ 4.8</div></div><div class="vsurf-body"><div class="vsurf-name ef">StageRight Rentals</div><div class="vsurf-cat mono">Stage & Equipment · Mumbai</div><div class="vsurf-tags"><span class="vsurf-tag" style="background:var(--sl);color:#0077aa">AV & SOUND</span><span class="vsurf-tag" style="background:var(--ll);color:#5a8a00;margin-left:4px;">TOP RATED</span></div><div class="vsurf-price">₹40,000 <span>/ day</span></div><div class="vsurf-btns"><button class="btn-select" id="vs9" onclick="toggleSelect(this)">+ Select</button><button class="btn-info">Details</button></div></div></div>
+          </div>
+          <div style="background:var(--d3);border:1px solid var(--d4);border-radius:11px;padding:13px;margin-top:14px;display:flex;align-items:center;gap:12px;" id="selection-bar">
+            <span class="mono" style="font-size:11px;color:#aaa;">SELECTED:</span>
+            <span class="ef" style="font-size:14px;font-weight:800;color:var(--lm);" id="sel-count">0 vendors</span>
+            <div style="flex:1;"></div>
+            <button class="btn-prim" style="padding:9px 18px;font-size:12px;">Send Request to Selected →</button>
+          </div>
+        </div>
+
+        <!-- TEAM -->
+        <div class="mod-panel" id="mp-team">
+          <div class="c3" style="margin-bottom:14px;">
+            <div class="stat-card"><div class="stat-lbl mono">Volunteers</div><div class="stat-val ef" style="color:var(--v)">32</div></div>
+            <div class="stat-card"><div class="stat-lbl mono">Teams</div><div class="stat-val ef" style="color:var(--sk)">6</div></div>
+            <div class="stat-card"><div class="stat-lbl mono">Open Tasks</div><div class="stat-val ef" style="color:var(--cr)">8</div></div>
+          </div>
+
+          <!-- VOLUNTEER ANNOUNCEMENT (new!) -->
+          <div class="vol-ann">
+            <div class="vol-ann-title ef">📢 Post Volunteer Announcement</div>
+            <div class="vol-form-row">
+              <div><label style="font-family:'DM Mono',monospace;font-size:11px;color:rgba(200,241,53,.8);letter-spacing:1px;display:block;margin-bottom:5px;text-transform:uppercase;">Role / Position</label><input class="f-inp" placeholder="e.g. Stage Manager, Registration Desk"></div>
+              <div><label style="font-family:'DM Mono',monospace;font-size:11px;color:rgba(200,241,53,.8);letter-spacing:1px;display:block;margin-bottom:5px;text-transform:uppercase;">Volunteers Needed</label><input class="f-inp" type="number" placeholder="e.g. 10" min="1"></div>
+            </div>
+            <div class="vol-form-row3">
+              <div><label style="font-family:'DM Mono',monospace;font-size:11px;color:rgba(200,241,53,.8);letter-spacing:1px;display:block;margin-bottom:5px;text-transform:uppercase;">Department</label><select class="f-inp f-sel"><option>Logistics</option><option>Marketing</option><option>Tech</option><option>Cultural</option><option>Security</option><option>General</option></select></div>
+              <div><label style="font-family:'DM Mono',monospace;font-size:11px;color:rgba(200,241,53,.8);letter-spacing:1px;display:block;margin-bottom:5px;text-transform:uppercase;">Apply By</label><input class="f-inp" type="date"></div>
+              <div><label style="font-family:'DM Mono',monospace;font-size:11px;color:rgba(200,241,53,.8);letter-spacing:1px;display:block;margin-bottom:5px;text-transform:uppercase;">Visible To</label><select class="f-inp f-sel"><option>All VJTI Students</option><option>All Colleges</option><option>Selected Colleges</option></select></div>
+            </div>
+            <div style="margin-bottom:12px;"><label style="font-family:'DM Mono',monospace;font-size:11px;color:rgba(200,241,53,.8);letter-spacing:1px;display:block;margin-bottom:5px;text-transform:uppercase;">Description / Skills Required</label><textarea class="f-inp" style="min-height:60px;resize:vertical;" placeholder="e.g. Must be available all 3 days. Good communication skills required."></textarea></div>
+            <button class="btn-lime-full" style="width:100%;padding:10px;font-size:13px;">📢 Post Announcement</button>
+          </div>
+
+          <!-- Active announcements -->
+          <div class="card-title" style="margin-bottom:10px;">Active Volunteer Announcements</div>
+          <div class="ann-card"><div class="ann-card-ico">🎪</div><div class="ann-card-body"><div class="ann-card-title ef">Stage & Backstage Crew</div><div class="ann-card-meta mono">Logistics · Posted 2 days ago · Apply by Mar 20</div><div class="ann-card-desc">Need 8 volunteers for stage setup and breakdown on all 3 days. Heavy lifting involved.</div><div class="ann-card-footer"><span class="sbadge" style="background:var(--vl);color:var(--v);">8 NEEDED</span><span class="sbadge" style="background:var(--ll);color:#5a8a00;margin-left:5px;">3 APPLIED</span><span style="font-size:11px;color:var(--mid);margin-left:5px;font-family:'DM Mono',monospace;">All VJTI Students</span><button class="btn-ghost-sm" style="margin-left:auto;padding:5px 12px;font-size:11px;">View Applications</button></div></div></div>
+          <div class="ann-card"><div class="ann-card-ico">📋</div><div class="ann-card-body"><div class="ann-card-title ef">Registration Desk Volunteers</div><div class="ann-card-meta mono">General · Posted 1 day ago · Apply by Mar 21</div><div class="ann-card-desc">5 volunteers needed at registration on Day 1 (08:00 AM – 12:00 PM). Laptop skills required.</div><div class="ann-card-footer"><span class="sbadge" style="background:var(--vl);color:var(--v);">5 NEEDED</span><span class="sbadge" style="background:var(--ll);color:#5a8a00;margin-left:5px;">5 APPLIED</span><span class="sbadge" style="background:var(--lm);color:var(--ink);margin-left:5px;">FULL ✓</span><button class="btn-ghost-sm" style="margin-left:auto;padding:5px 12px;font-size:11px;">View Applications</button></div></div></div>
+
+          <div class="c2e" style="margin-top:14px;">
+            <div class="card">
+              <div class="card-title">Teams</div>
+              <div class="team-card"><div class="team-stripe" style="background:var(--v)"></div><div class="team-info"><div class="team-name ef">Logistics</div><div class="team-lead mono">Lead: Riya Shah</div><div class="team-avs"><div class="m-av" style="background:var(--vl);color:var(--v)">R</div><div class="m-av" style="background:var(--d3);color:#888">A</div><div class="m-av" style="background:var(--d3);color:var(--mid)">+5</div></div></div><span class="pill" style="background:var(--sl);color:#0077aa;font-size:9px;">8 members</span></div>
+              <div class="team-card"><div class="team-stripe" style="background:var(--sk)"></div><div class="team-info"><div class="team-name ef">Marketing</div><div class="team-lead mono">Lead: Aditya Kumar</div><div class="team-avs"><div class="m-av" style="background:var(--sl);color:var(--sk)">A</div><div class="m-av" style="background:var(--d3);color:#888">M</div><div class="m-av" style="background:var(--d3);color:var(--mid)">+3</div></div></div><span class="pill" style="background:var(--sl);color:#0077aa;font-size:9px;">5 members</span></div>
+              <div class="team-card"><div class="team-stripe" style="background:var(--cr)"></div><div class="team-info"><div class="team-name ef">Security</div><div class="team-lead mono">Lead: Tanmay Joshi</div><div class="team-avs"><div class="m-av" style="background:var(--cl);color:var(--cr)">T</div><div class="m-av" style="background:var(--d3);color:#888">K</div><div class="m-av" style="background:var(--d3);color:var(--mid)">+4</div></div></div><span class="pill" style="background:var(--cl);color:var(--cr);font-size:9px;">6 members</span></div>
+              <button class="btn-ghost-sm" style="margin-top:8px;width:100%;">+ Add Member</button>
+            </div>
+            <div class="card">
+              <div class="card-title">Task Board</div>
+              <div class="task-board">
+                <div class="task-col"><div class="task-col-hd mono">TODO</div><div class="task-item"><div class="task-tag" style="background:var(--cl);color:var(--cr)">LOGISTICS</div><br>Book water tankers day 2</div><div class="task-item"><div class="task-tag" style="background:var(--vl);color:var(--v)">DECOR</div><br>Confirm LED delivery</div></div>
+                <div class="task-col"><div class="task-col-hd mono">IN PROGRESS</div><div class="task-item"><div class="task-tag" style="background:var(--sl);color:var(--sk)">MARKETING</div><br>Design final poster</div><div class="task-item"><div class="task-tag" style="background:var(--ll);color:#5a8a00">TICKET</div><br>Set up QR gate</div></div>
+                <div class="task-col"><div class="task-col-hd mono">DONE ✓</div><div class="task-item" style="opacity:.45;"><div class="task-tag" style="background:var(--d4);color:var(--mid)">SPONSOR</div><br>Send MOU to boAt</div><div class="task-item" style="opacity:.45;"><div class="task-tag" style="background:var(--d4);color:var(--mid)">VENUE</div><br>Confirm auditorium</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- end screen-event -->
+
+      <!-- ── ACCOUNT SCREEN ── -->
+      <div class="o-screen" id="screen-account">
+        <div class="pg-title ef">My <span style="color:var(--v)">Account</span></div>
+        <p class="pg-sub mono">Manage your organizer profile and preferences</p>
+        <div class="acc-hero">
+          <div class="acc-av-big ef">AK</div>
+          <div>
+            <div class="acc-name ef">Aryan Kumar</div>
+            <div class="acc-role mono">Organizer · FestFlow Platform</div>
+            <div class="acc-college">B.E. Computer Engineering · VJTI, Mumbai · Final Year</div>
+            <div style="margin-top:8px;display:flex;gap:7px;"><span class="sbadge" style="background:var(--vl);color:var(--v);">3 EVENTS</span><span class="sbadge" style="background:var(--ll);color:#5a8a00;">32 VOLUNTEERS</span><span class="sbadge" style="background:var(--sl);color:#0077aa;">7 SPONSORS</span></div>
+          </div>
+          <div style="margin-left:auto;"><button class="btn-lime-full" style="font-size:12px;padding:8px 16px;">Edit Profile</button></div>
+        </div>
+        <div class="acc-grid">
+          <div class="acc-section">
+            <div class="acc-sec-title ef">Personal Details</div>
+            <div class="acc-field"><div class="acc-field-lbl mono">Full Name</div><div class="acc-field-val">Aryan Kumar</div></div>
+            <div class="acc-field"><div class="acc-field-lbl mono">Email</div><div class="acc-field-val">aryan.kumar@vjti.ac.in</div></div>
+            <div class="acc-field"><div class="acc-field-lbl mono">Phone</div><div class="acc-field-val">+91 98765 43210</div></div>
+            <div class="acc-field"><div class="acc-field-lbl mono">College</div><div class="acc-field-val">VJTI, Mumbai</div></div>
+            <div class="acc-field"><div class="acc-field-lbl mono">Course</div><div class="acc-field-val">B.E. Computer Engineering</div></div>
+          </div>
+          <div class="acc-section">
+            <div class="acc-sec-title ef">Organizer Stats</div>
+            <div class="acc-field"><div class="acc-field-lbl mono">Events Organized</div><div class="acc-field-val ef" style="font-size:22px;font-weight:900;color:var(--v);">3</div></div>
+            <div class="acc-field"><div class="acc-field-lbl mono">Total Tickets Sold</div><div class="acc-field-val ef" style="font-size:22px;font-weight:900;color:var(--lm);">840</div></div>
+            <div class="acc-field"><div class="acc-field-lbl mono">Sponsors Managed</div><div class="acc-field-val ef" style="font-size:22px;font-weight:900;color:var(--sk);">7</div></div>
+            <div class="acc-field"><div class="acc-field-lbl mono">Member Since</div><div class="acc-field-val">January 2024</div></div>
+          </div>
+          <div class="acc-section">
+            <div class="acc-sec-title ef">Notification Settings</div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:13px;">Budget alerts</span><div style="width:36px;height:20px;background:var(--v);border-radius:10px;position:relative;cursor:pointer;"><div style="width:16px;height:16px;background:white;border-radius:50%;position:absolute;right:2px;top:2px;"></div></div></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:13px;">New sponsor offers</span><div style="width:36px;height:20px;background:var(--v);border-radius:10px;position:relative;cursor:pointer;"><div style="width:16px;height:16px;background:white;border-radius:50%;position:absolute;right:2px;top:2px;"></div></div></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:13px;">Ticket milestones</span><div style="width:36px;height:20px;background:var(--v);border-radius:10px;position:relative;cursor:pointer;"><div style="width:16px;height:16px;background:white;border-radius:50%;position:absolute;right:2px;top:2px;"></div></div></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:13px;">Volunteer applications</span><div style="width:36px;height:20px;background:var(--d4);border-radius:10px;position:relative;cursor:pointer;"><div style="width:16px;height:16px;background:white;border-radius:50%;position:absolute;left:2px;top:2px;"></div></div></div>
+            </div>
+          </div>
+          <div class="acc-section">
+            <div class="acc-sec-title ef">Platform Access</div>
+            <div class="acc-field"><div class="acc-field-lbl mono">Account Type</div><div class="acc-field-val"><span class="sbadge" style="background:var(--vl);color:var(--v);">ORGANIZER PRO</span></div></div>
+            <div class="acc-field"><div class="acc-field-lbl mono">Credentials Issued By</div><div class="acc-field-val">FestFlow Platform</div></div>
+            <div class="acc-field"><div class="acc-field-lbl mono">Account ID</div><div class="acc-field-val mono" style="font-size:11px;color:var(--mid);">ORG-VJTI-2024-0042</div></div>
+            <div style="margin-top:10px;display:flex;gap:7px;"><button class="btn-ghost-sm" style="flex:1;font-size:11px;">Change Password</button><button class="btn-ghost-sm" style="flex:1;font-size:11px;color:var(--cr);border-color:rgba(255,77,109,.3);">Delete Account</button></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── BROWSE VENDORS & SPONSORS ── -->
+      <div class="o-screen" id="screen-browse">
+        <div class="pg-title ef">Browse <span style="color:var(--lm)">Vendors & Sponsors</span></div>
+        <p class="pg-sub mono">Discover vendors for your event needs and brands to invite for sponsorship</p>
+
+        <div class="browse-tabs">
+          <button class="browse-tab on" onclick="switchBrowseTab('vendors',this)">🏪 Vendors</button>
+          <button class="browse-tab" onclick="switchBrowseTab('sponsors',this)">🤝 Sponsors / Brands</button>
+        </div>
+
+        <!-- VENDORS PANEL -->
+        <div class="browse-panel on" id="bp-vendors">
+          <div class="vsurf-filter" style="margin-bottom:14px;">
+            <div class="vsurf-search"><span style="font-size:13px;color:var(--mid);">🔍</span><input placeholder="Search vendors by name, city, service..."></div>
+            <select style="background:var(--d3);border:1px solid var(--d4);color:var(--chalk);font-family:'DM Mono',monospace;font-size:10px;padding:9px 11px;border-radius:8px;cursor:pointer;outline:none;"><option>Any City</option><option>Mumbai</option><option>Pune</option><option>Delhi</option></select>
+            <select style="background:var(--d3);border:1px solid var(--d4);color:var(--chalk);font-family:'DM Mono',monospace;font-size:10px;padding:9px 11px;border-radius:8px;cursor:pointer;outline:none;"><option>Sort: Rating</option><option>Sort: Price ↑</option><option>Sort: Price ↓</option></select>
+          </div>
+          <div class="vsurf-cats">
+            <button class="vcat-btn on" onclick="vcatFilter(this)">All</button>
+            <button class="vcat-btn" onclick="vcatFilter(this)">🍽️ Catering</button>
+            <button class="vcat-btn" onclick="vcatFilter(this)">🔊 AV & Sound</button>
+            <button class="vcat-btn" onclick="vcatFilter(this)">💡 Lighting</button>
+            <button class="vcat-btn" onclick="vcatFilter(this)">🎨 Decoration</button>
+            <button class="vcat-btn" onclick="vcatFilter(this)">🔒 Security</button>
+            <button class="vcat-btn" onclick="vcatFilter(this)">📸 Photography</button>
+            <button class="vcat-btn" onclick="vcatFilter(this)">🚐 Transport</button>
+          </div>
+          <div class="vsurf-grid">
+            <div class="vsurf-card"><div class="vsurf-banner" style="background:linear-gradient(135deg,#1a0005,#3a0010)">🍽️<div class="vsurf-rating">⭐ 4.8</div></div><div class="vsurf-body"><div class="vsurf-name ef">Annapurna Caterers</div><div class="vsurf-cat mono">Catering · Mumbai</div><div class="vsurf-tags"><span class="vsurf-tag" style="background:var(--cl);color:var(--cr)">CATERING</span><span class="vsurf-tag" style="background:var(--ll);color:#5a8a00;margin-left:4px;">TOP RATED</span></div><div class="vsurf-price">₹180/plate <span>onwards</span></div><div class="vsurf-btns"><button class="btn-select" onclick="toggleSelect(this)">+ Select</button><button class="btn-info">Details</button></div></div></div>
+            <div class="vsurf-card"><div class="vsurf-banner" style="background:linear-gradient(135deg,#003a52,#001a30)">🔊<div class="vsurf-rating">⭐ 4.6</div></div><div class="vsurf-body"><div class="vsurf-name ef">SoundWave Pro</div><div class="vsurf-cat mono">AV & Sound · Mumbai</div><div class="vsurf-tags"><span class="vsurf-tag" style="background:var(--sl);color:#0077aa">AV & SOUND</span></div><div class="vsurf-price">₹25,000 <span>/ day</span></div><div class="vsurf-btns"><button class="btn-select" onclick="toggleSelect(this)">+ Select</button><button class="btn-info">Details</button></div></div></div>
+            <div class="vsurf-card"><div class="vsurf-banner" style="background:linear-gradient(135deg,#1a2200,#2d3a00)">💡<div class="vsurf-rating">⭐ 4.7</div></div><div class="vsurf-body"><div class="vsurf-name ef">Lumina Lighting</div><div class="vsurf-cat mono">Lighting · Mumbai</div><div class="vsurf-tags"><span class="vsurf-tag" style="background:var(--ll);color:#5a8a00">LIGHTING</span></div><div class="vsurf-price">₹18,000 <span>/ day</span></div><div class="vsurf-btns"><button class="btn-select" onclick="toggleSelect(this)">+ Select</button><button class="btn-info">Details</button></div></div></div>
+            <div class="vsurf-card"><div class="vsurf-banner" style="background:linear-gradient(135deg,#1a0a3e,#2d1260)">🎨<div class="vsurf-rating">⭐ 4.5</div></div><div class="vsurf-body"><div class="vsurf-name ef">Decor Dreams</div><div class="vsurf-cat mono">Decoration · Mumbai</div><div class="vsurf-tags"><span class="vsurf-tag" style="background:var(--vl);color:var(--v)">DECORATION</span></div><div class="vsurf-price">₹35,000 <span>package</span></div><div class="vsurf-btns"><button class="btn-select" onclick="toggleSelect(this)">+ Select</button><button class="btn-info">Details</button></div></div></div>
+            <div class="vsurf-card"><div class="vsurf-banner" style="background:linear-gradient(135deg,#2a0010,#4a0025)">🔒<div class="vsurf-rating">⭐ 4.9</div></div><div class="vsurf-body"><div class="vsurf-name ef">SafeGuard Security</div><div class="vsurf-cat mono">Security · Mumbai</div><div class="vsurf-tags"><span class="vsurf-tag" style="background:var(--cl);color:var(--cr)">SECURITY</span><span class="vsurf-tag" style="background:var(--ll);color:#5a8a00;margin-left:4px;">VERIFIED ✓</span></div><div class="vsurf-price">₹8,000 <span>/ day</span></div><div class="vsurf-btns"><button class="btn-select" onclick="toggleSelect(this)">+ Select</button><button class="btn-info">Details</button></div></div></div>
+            <div class="vsurf-card"><div class="vsurf-banner" style="background:linear-gradient(135deg,#003a52,#001a30)">📸<div class="vsurf-rating">⭐ 4.7</div></div><div class="vsurf-body"><div class="vsurf-name ef">SnapFrame Studios</div><div class="vsurf-cat mono">Photography · Mumbai</div><div class="vsurf-tags"><span class="vsurf-tag" style="background:var(--sl);color:#0077aa">PHOTOGRAPHY</span></div><div class="vsurf-price">₹15,000 <span>/ day</span></div><div class="vsurf-btns"><button class="btn-select" onclick="toggleSelect(this)">+ Select</button><button class="btn-info">Details</button></div></div></div>
+          </div>
+          <div style="background:var(--d3);border:1px solid var(--d4);border-radius:11px;padding:13px;margin-top:14px;display:flex;align-items:center;gap:12px;">
+            <span class="mono" style="font-size:11px;color:#aaa;">SELECTED:</span>
+            <span class="ef" style="font-size:14px;font-weight:800;color:var(--lm);" id="browse-sel-count">0 vendors</span>
+            <div style="flex:1;"></div>
+            <button class="btn-prim" style="padding:9px 18px;font-size:12px;">Send Request to Selected →</button>
+          </div>
+        </div>
+
+        <!-- SPONSORS PANEL -->
+        <div class="browse-panel" id="bp-sponsors">
+          <div class="vsurf-filter" style="margin-bottom:16px;">
+            <div class="vsurf-search"><span style="font-size:13px;color:var(--mid);">🔍</span><input placeholder="Search brands by name, industry..."></div>
+            <select style="background:var(--d3);border:1px solid var(--d4);color:var(--chalk);font-family:'DM Mono',monospace;font-size:10px;padding:9px 11px;border-radius:8px;cursor:pointer;outline:none;"><option>All Industries</option><option>Food & Bev</option><option>Electronics</option><option>Finance</option><option>EdTech</option></select>
+            <select style="background:var(--d3);border:1px solid var(--d4);color:var(--chalk);font-family:'DM Mono',monospace;font-size:10px;padding:9px 11px;border-radius:8px;cursor:pointer;outline:none;"><option>Sort: Budget High</option><option>Sort: Budget Low</option><option>Sort: Match %</option></select>
+          </div>
+          <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--mid);margin-bottom:10px;">TOP MATCHES FOR YOUR EVENT</div>
+          <div class="spon-browse-card"><div class="spon-logo-big" style="background:#ff6b00">Z</div><div class="spon-info"><div class="spon-name ef">Zomato</div><div class="spon-cat mono">Food Tech · 10M+ Users</div><div class="spon-tags-row"><span class="sbadge" style="background:var(--ll);color:#5a8a00;">PREV PARTNERED</span><span class="sbadge" style="background:var(--vl);color:var(--v);margin-left:4px;">98% MATCH</span></div></div><div class="spon-deal"><div class="spon-amt">Up to ₹50K</div><div class="spon-reach mono">Est. 2,000 reach</div><button class="spon-invite-btn">✉ Invite to Sponsor</button></div></div>
+          <div class="spon-browse-card"><div class="spon-logo-big" style="background:#0070f3">B</div><div class="spon-info"><div class="spon-name ef">boAt Audio</div><div class="spon-cat mono">Consumer Electronics · Youth Brand</div><div class="spon-tags-row"><span class="sbadge" style="background:var(--cl);color:var(--cr);">TITLE SPONSOR</span><span class="sbadge" style="background:var(--ll);color:#5a8a00;margin-left:4px;">96% MATCH</span></div></div><div class="spon-deal"><div class="spon-amt">Up to ₹80K</div><div class="spon-reach mono">2,000+ reach</div><button class="spon-invite-btn">✉ Invite to Sponsor</button></div></div>
+          <div class="spon-browse-card"><div class="spon-logo-big" style="background:#00aa44">S</div><div class="spon-info"><div class="spon-name ef">Swiggy</div><div class="spon-cat mono">Food Delivery · College Campaigns</div><div class="spon-tags-row"><span class="sbadge" style="background:var(--sl);color:#0077aa;">CO-SPONSOR</span><span class="sbadge" style="background:var(--ll);color:#5a8a00;margin-left:4px;">91% MATCH</span></div></div><div class="spon-deal"><div class="spon-amt">Up to ₹35K</div><div class="spon-reach mono">1,800+ reach</div><button class="spon-invite-btn">✉ Invite to Sponsor</button></div></div>
+          <div class="spon-browse-card"><div class="spon-logo-big" style="background:#6366f1">C</div><div class="spon-info"><div class="spon-name ef">CRED</div><div class="spon-cat mono">FinTech · Premium Audience</div><div class="spon-tags-row"><span class="sbadge" style="background:var(--vl);color:var(--v);">NEW</span><span class="sbadge" style="background:var(--d4);color:var(--mid);margin-left:4px;">85% MATCH</span></div></div><div class="spon-deal"><div class="spon-amt">Up to ₹60K</div><div class="spon-reach mono">2,000+ reach</div><button class="spon-invite-btn">✉ Invite to Sponsor</button></div></div>
+          <div class="spon-browse-card"><div class="spon-logo-big" style="background:#e44d26">D</div><div class="spon-info"><div class="spon-name ef">Dunzo</div><div class="spon-cat mono">Quick Commerce · Campus Presence</div><div class="spon-tags-row"><span class="sbadge" style="background:var(--sl);color:#0077aa;">ASSOCIATE SPONSOR</span></div></div><div class="spon-deal"><div class="spon-amt">Up to ₹20K</div><div class="spon-reach mono">1,500+ reach</div><button class="spon-invite-btn">✉ Invite to Sponsor</button></div></div>
+        </div>
+      </div>
+
+    </div><!-- o-content -->
+  </div><!-- o-body -->
+</div><!-- iface-org -->
+
+<!-- MODALS -->
+<div class="modal-bg" id="modal-act"><div class="modal-box"><div class="modal-hd"><h3 class="ef">Add Activity</h3><button class="modal-close" onclick="this.closest('.modal-bg').classList.remove('open')">✕</button></div><div class="fg"><label class="fl mono">Activity Name</label><input class="fi" placeholder="e.g. Workshop: ML Basics"></div><div class="fi2"><div class="fg"><label class="fl mono">Start Time</label><input class="fi" type="time" value="09:00"></div><div class="fg"><label class="fl mono">Duration</label><input class="fi" placeholder="e.g. 2 hrs"></div></div><div class="fg"><label class="fl mono">Venue</label><input class="fi" placeholder="e.g. Seminar Hall 2"></div><div class="fg"><label class="fl mono">Description</label><textarea class="fi ftxt" placeholder="What happens during this activity?"></textarea></div><div class="fi2"><div class="fg"><label class="fl mono">Assigned Team</label><select class="fi" style="cursor:pointer"><option>Core Committee</option><option>Tech Committee</option><option>Cultural Committee</option><option>Logistics Team</option></select></div><div class="fg"><label class="fl mono">Category</label><select class="fi" style="cursor:pointer"><option>Competition</option><option>Workshop</option><option>Talk</option><option>Performance</option><option>Ceremony</option></select></div></div><button class="btn-lime-full" style="width:100%">Add to Schedule</button></div></div>
+<div class="modal-bg" id="modal-exp"><div class="modal-box"><div class="modal-hd"><h3 class="ef">Add Expense</h3><button class="modal-close" onclick="this.closest('.modal-bg').classList.remove('open')">✕</button></div><div class="fg"><label class="fl mono">Category</label><select class="fi" style="cursor:pointer"><option>🚚 Logistics</option><option>📣 Marketing</option><option>🍽️ Catering</option><option>🎨 Decor</option><option>🎤 Artists</option></select></div><div class="fg"><label class="fl mono">Description</label><input class="fi" placeholder="e.g. Stage sound system"></div><div class="fg"><label class="fl mono">Amount (₹)</label><input class="fi" type="number" placeholder="0"></div><div class="fg"><label class="fl mono">Date</label><input class="fi" type="date"></div><button class="btn-prim" style="width:100%">Add Expense</button></div></div>
+<div class="modal-bg" id="modal-create"><div class="modal-box" style="width:460px"><div class="modal-hd"><h3 class="ef">Create New Event</h3><button class="modal-close" onclick="this.closest('.modal-bg').classList.remove('open')">✕</button></div><div class="fg"><label class="fl mono">Event Name</label><input class="fi" placeholder="e.g. TechFest 2026"></div><div class="fg"><label class="fl mono">College / Institution</label><input class="fi" placeholder="e.g. VJTI, Mumbai"></div><div class="fi2"><div class="fg"><label class="fl mono">Start Date</label><input class="fi" type="date"></div><div class="fg"><label class="fl mono">End Date</label><input class="fi" type="date"></div></div><div class="fg"><label class="fl mono">Venue</label><input class="fi" placeholder="e.g. Main Auditorium"></div><div class="fi2"><div class="fg"><label class="fl mono">Total Budget (₹)</label><input class="fi" placeholder="e.g. 500000"></div><div class="fg"><label class="fl mono">Expected Footfall</label><input class="fi" placeholder="e.g. 2000"></div></div><div class="fg"><label class="fl mono">Event Type</label><select class="fi" style="cursor:pointer"><option>⚡ Technical</option><option>🎭 Cultural</option><option>🏆 Sports</option><option>🎵 Music</option></select></div><button class="btn-lime-full" style="width:100%">Create Event →</button></div></div>
+
+<!-- ══════════════════════════ STUDENT ══════════════════════════ -->
+<div class="iface" id="iface-stu">
+  <div class="s-topbar">
+    <div class="s-logo ef">fest<span>FLOW</span></div>
+    <div class="s-search"><span class="s-search-ico">🔍</span><input placeholder="Search events, colleges, cities..."></div>
+    <div class="s-spacer"></div>
+    <div class="s-nav-tabs">
+      <button class="s-nav-tab on" onclick="sNav('discover',this)">Discover</button>
+      <button class="s-nav-tab" onclick="sNav('my-tickets',this)">My Tickets</button>
+      <button class="s-nav-tab" onclick="sNav('vol-invites',this)">🙋 Volunteer Invites <span style="background:var(--sk);color:var(--ink);font-size:8px;padding:2px 6px;border-radius:4px;font-weight:700;margin-left:3px;">3</span></button>
+    </div>
+    <div class="s-avatar ef" onclick="sNav('s-account',null)" style="cursor:pointer;" title="My Account">RS</div>
+  </div>
+  <div class="s-body">
+    <div class="s-screen on" id="ss-discover">
+      <div class="s-hero"><h2 class="ef">Discover Fests <span>Near You 🎪</span></h2><p>Events happening across colleges in India — find, explore & grab your tickets.</p><div class="s-hero-btns"><button style="background:var(--lm);color:var(--ink);border:none;padding:9px 18px;border-radius:8px;font-family:'Epilogue',sans-serif;font-weight:700;font-size:12px;cursor:pointer;">🔥 Trending Now</button><button style="background:var(--d3);color:#888;border:1px solid var(--d4);padding:9px 18px;border-radius:8px;font-family:'Epilogue',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">📍 Near Mumbai</button></div></div>
+      <div class="s-filter-bar">
+        <button class="s-filter-btn on">All Events</button><button class="s-filter-btn">Technical</button><button class="s-filter-btn">Cultural</button><button class="s-filter-btn">Music</button><button class="s-filter-btn">Sports</button><button class="s-filter-btn">Mumbai</button><button class="s-filter-btn">Pune</button><button class="s-filter-btn">Delhi</button><button class="s-filter-btn">Free Entry</button><button class="s-filter-btn">This Month</button>
+      </div>
+      <div style="font-family:'Epilogue',sans-serif;font-size:14px;font-weight:800;margin-bottom:12px;">🔥 Trending Events</div>
+      <div class="s-events-grid">
+        <div class="s-ev-card" onclick="sNav('event-detail',null)"><div class="s-ev-banner" style="background:linear-gradient(135deg,#1a0a3e,#2d1260)">⚡<div class="s-ev-trend"><span class="sbadge" style="background:var(--lm);color:var(--ink);">TRENDING</span></div></div><div class="s-ev-body"><div class="s-ev-college mono">VJTI MUMBAI</div><div class="s-ev-name ef">TechFest VJTI '26</div><div class="s-ev-meta mono">May 22–24 · Mumbai · 3 days</div><div class="s-ev-tags"><span class="sbadge" style="background:var(--vl);color:var(--v);font-size:8px;">TECHNICAL</span><span class="sbadge" style="background:var(--sl);color:#0077aa;font-size:8px;margin-left:4px;">HACKATHON</span></div><div class="s-ev-footer"><div class="s-ev-price ef" style="color:var(--cr);">₹399<span style="font-size:10px;color:var(--mid);font-weight:400"> onwards</span></div><button style="background:var(--cr);color:white;border:none;font-family:'DM Mono',monospace;font-size:9px;font-weight:700;padding:6px 12px;border-radius:6px;cursor:pointer;">Buy Ticket</button></div></div></div>
+        <div class="s-ev-card"><div class="s-ev-banner" style="background:linear-gradient(135deg,#003a52,#001a30)">🎭<div class="s-ev-trend"><span class="sbadge" style="background:var(--sk);color:var(--ink);">10K FOOTFALL</span></div></div><div class="s-ev-body"><div class="s-ev-college mono">IIT BOMBAY</div><div class="s-ev-name ef">Mood Indigo '25</div><div class="s-ev-meta mono">Dec 12–15 · Mumbai · 4 days</div><div class="s-ev-tags"><span class="sbadge" style="background:var(--sl);color:#0077aa;font-size:8px;">CULTURAL</span><span class="sbadge" style="background:var(--cl);color:var(--cr);font-size:8px;margin-left:4px;">MUSIC</span></div><div class="s-ev-footer"><div class="s-ev-price ef" style="color:var(--cr);">₹599<span style="font-size:10px;color:var(--mid);font-weight:400"> onwards</span></div><button style="background:var(--cr);color:white;border:none;font-family:'DM Mono',monospace;font-size:9px;font-weight:700;padding:6px 12px;border-radius:6px;cursor:pointer;">Buy Ticket</button></div></div></div>
+        <div class="s-ev-card"><div class="s-ev-banner" style="background:linear-gradient(135deg,#1a2200,#2d3a00)">🚀</div><div class="s-ev-body"><div class="s-ev-college mono">VIT PUNE</div><div class="s-ev-name ef">Enthusia '25</div><div class="s-ev-meta mono">Apr 5–7 · Pune · 3 days</div><div class="s-ev-tags"><span class="sbadge" style="background:var(--sl);color:#0077aa;font-size:8px;">CULTURAL</span></div><div class="s-ev-footer"><div class="s-ev-price ef" style="color:var(--cr);">₹299<span style="font-size:10px;color:var(--mid);font-weight:400"> onwards</span></div><button style="background:var(--cr);color:white;border:none;font-family:'DM Mono',monospace;font-size:9px;font-weight:700;padding:6px 12px;border-radius:6px;cursor:pointer;">Buy Ticket</button></div></div></div>
+        <div class="s-ev-card"><div class="s-ev-banner" style="background:linear-gradient(135deg,#2a0010,#4a0025)">🎵</div><div class="s-ev-body"><div class="s-ev-college mono">SYMBIOSIS</div><div class="s-ev-name ef">Symbi Fusion '25</div><div class="s-ev-meta mono">Apr 18–20 · Pune · 3 days</div><div class="s-ev-tags"><span class="sbadge" style="background:var(--cl);color:var(--cr);font-size:8px;">MUSIC</span></div><div class="s-ev-footer"><div class="s-ev-price ef" style="color:var(--cr);">₹499<span style="font-size:10px;color:var(--mid);font-weight:400"> onwards</span></div><button style="background:var(--cr);color:white;border:none;font-family:'DM Mono',monospace;font-size:9px;font-weight:700;padding:6px 12px;border-radius:6px;cursor:pointer;">Buy Ticket</button></div></div></div>
+        <div class="s-ev-card"><div class="s-ev-banner" style="background:linear-gradient(135deg,#1a0a3e,#0a0020)">🏆</div><div class="s-ev-body"><div class="s-ev-college mono">IIT KGP</div><div class="s-ev-name ef">Kshitij '25</div><div class="s-ev-meta mono">Feb 8–10 · Kharagpur · 3 days</div><div class="s-ev-tags"><span class="sbadge" style="background:var(--vl);color:var(--v);font-size:8px;">TECHNICAL</span></div><div class="s-ev-footer"><div class="s-ev-price ef" style="color:var(--lm);">FREE<span style="font-size:10px;color:var(--mid);font-weight:400"> entry</span></div><button style="background:var(--ll);color:#5a8a00;border:none;font-family:'DM Mono',monospace;font-size:9px;font-weight:700;padding:6px 12px;border-radius:6px;cursor:pointer;">Register</button></div></div></div>
+        <div class="s-ev-card"><div class="s-ev-banner" style="background:linear-gradient(135deg,#003a52,#00223a)">🎓</div><div class="s-ev-body"><div class="s-ev-college mono">IIT PATNA</div><div class="s-ev-name ef">Celesta '25</div><div class="s-ev-meta mono">Mar 14–16 · Patna · 3 days</div><div class="s-ev-tags"><span class="sbadge" style="background:var(--vl);color:var(--v);font-size:8px;">TECHNICAL</span><span class="sbadge" style="background:var(--sl);color:#0077aa;font-size:8px;margin-left:4px;">CULTURAL</span></div><div class="s-ev-footer"><div class="s-ev-price ef" style="color:var(--cr);">₹199<span style="font-size:10px;color:var(--mid);font-weight:400"> onwards</span></div><button style="background:var(--cr);color:white;border:none;font-family:'DM Mono',monospace;font-size:9px;font-weight:700;padding:6px 12px;border-radius:6px;cursor:pointer;">Buy Ticket</button></div></div></div>
+      </div>
+    </div>
+    <div class="s-screen" id="ss-event-detail">
+      <div style="margin-bottom:13px;"><button style="background:var(--d3);color:#888;border:1px solid var(--d4);padding:7px 13px;border-radius:7px;font-family:'Epilogue',sans-serif;font-size:12px;font-weight:600;cursor:pointer;" onclick="sNav('discover',null)">← Back</button></div>
+      <div class="s-ev-detail-header"><div class="s-ev-detail-banner" style="background:linear-gradient(135deg,#1a0a3e,#2d1260)">⚡</div><div class="s-ev-detail-body"><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--mid);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">VJTI MUMBAI</div><div class="s-ev-detail-name ef">TechFest VJTI '26</div><div class="s-ev-detail-meta mono">📅 May 22–24, 2026 &nbsp;·&nbsp; 📍 VJTI Auditorium, Mumbai &nbsp;·&nbsp; 👥 2,000 expected</div><div class="s-ev-detail-desc">VJTI's flagship technical festival — hackathons, paper presentations, robotics, and more. 3 days of innovation, networking, and pure energy.</div><div style="display:flex;gap:6px;flex-wrap:wrap;"><span class="sbadge" style="background:var(--vl);color:var(--v);">TECHNICAL</span><span class="sbadge" style="background:var(--sl);color:#0077aa;margin-left:4px;">HACKATHON</span><span class="sbadge" style="background:var(--ll);color:#5a8a00;margin-left:4px;">TRENDING 🔥</span></div></div></div>
+      <div class="s-ev-two">
+        <div class="s-schedule-card"><div class="s-sched-title ef">📅 Event Schedule</div><div class="s-sched-day-tabs"><button class="s-sched-dtab on" onclick="sDayTab(0,this)">Day 1</button><button class="s-sched-dtab" onclick="sDayTab(1,this)">Day 2</button><button class="s-sched-dtab" onclick="sDayTab(2,this)">Day 3</button></div>
+          <div id="sd-0"><div class="s-sched-act"><div class="s-sched-time mono">08:00 AM</div><div><div class="s-sched-name ef">Registration & Check-in</div><div class="s-sched-venue mono">📍 Main Gate · 2 hrs</div></div></div><div class="s-sched-act"><div class="s-sched-time mono">10:00 AM</div><div><div class="s-sched-name ef">Inaugural Ceremony</div><div class="s-sched-venue mono">📍 Main Auditorium · 1.5 hrs</div></div></div><div class="s-sched-act" style="background:rgba(200,241,53,.05);border-radius:6px;padding:8px;"><div class="s-sched-time mono" style="color:var(--lm)">12:00 PM</div><div><div class="s-sched-name ef" style="color:var(--lm)">Hackathon Begins 🟢</div><div class="s-sched-venue mono">📍 Computer Lab · 4 hrs</div></div></div><div class="s-sched-act"><div class="s-sched-time mono">06:00 PM</div><div><div class="s-sched-name ef">Sponsor Showcase</div><div class="s-sched-venue mono">📍 College Grounds · 2 hrs</div></div></div><div class="s-sched-act" style="border:none"><div class="s-sched-time mono">08:00 PM</div><div><div class="s-sched-name ef">Evening Performance</div><div class="s-sched-venue mono">📍 Open Air Theatre · 2.5 hrs</div></div></div></div>
+          <div id="sd-1" style="display:none"><div class="s-sched-act"><div class="s-sched-time mono">09:00 AM</div><div><div class="s-sched-name ef">Hackathon Mid Review</div><div class="s-sched-venue mono">📍 Computer Lab · 2 hrs</div></div></div><div class="s-sched-act"><div class="s-sched-time mono">11:00 AM</div><div><div class="s-sched-name ef">Paper Presentation Finals</div><div class="s-sched-venue mono">📍 Main Auditorium · 3 hrs</div></div></div><div class="s-sched-act" style="border:none"><div class="s-sched-time mono">07:00 PM</div><div><div class="s-sched-name ef">Battle of Bands</div><div class="s-sched-venue mono">📍 Open Air Theatre · 3 hrs</div></div></div></div>
+          <div id="sd-2" style="display:none"><div class="s-sched-act"><div class="s-sched-time mono">10:00 AM</div><div><div class="s-sched-name ef">Hackathon Final Pitches</div><div class="s-sched-venue mono">📍 Main Auditorium · 3 hrs</div></div></div><div class="s-sched-act" style="border:none"><div class="s-sched-time mono">05:00 PM</div><div><div class="s-sched-name ef">Closing Ceremony</div><div class="s-sched-venue mono">📍 College Grounds · 1.5 hrs</div></div></div></div>
+        </div>
+        <div class="ticket-box"><div class="ticket-box-title ef">🎟️ Get Your Tickets</div><div class="ticket-tier sel" onclick="selTier(this)"><div class="tt-top"><div class="tt-name ef">VIP Pass</div><div class="tt-sel-circle"></div></div><div style="display:flex;justify-content:space-between;align-items:center;"><div class="tt-price ef">₹799</div><div class="tt-avail mono">80/100 remaining</div></div><div style="font-size:11px;color:#666;margin-top:4px;">Priority seating · Exclusive merch · Meet & greet</div></div><div class="ticket-tier" onclick="selTier(this)"><div class="tt-top"><div class="tt-name ef">Standard Pass</div><div class="tt-sel-circle"></div></div><div style="display:flex;justify-content:space-between;align-items:center;"><div class="tt-price ef">₹399</div><div class="tt-avail mono">140/700 remaining</div></div><div style="font-size:11px;color:#666;margin-top:4px;">Full 3-day access · All competitions & performances</div></div><div class="ticket-tier" onclick="selTier(this)"><div class="tt-top"><div class="tt-name ef">Day Pass</div><div class="tt-sel-circle"></div></div><div style="display:flex;justify-content:space-between;align-items:center;"><div class="tt-price ef">₹149</div><div class="tt-avail mono">200/400 remaining</div></div><div style="font-size:11px;color:#666;margin-top:4px;">Single day access only</div></div><div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--mid);margin-top:12px;margin-bottom:6px;">QUANTITY</div><div class="qty-row"><button class="qty-btn" onclick="changeQty(-1)">−</button><div class="qty-val ef" id="qty-val">1</div><button class="qty-btn" onclick="changeQty(1)">+</button><span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--mid);">tickets</span></div><div class="ticket-total"><div class="ticket-total-label mono">TOTAL</div><div class="ticket-total-val ef" id="ticket-total">₹799</div></div><button style="background:var(--cr);color:white;border:none;width:100%;padding:12px;border-radius:8px;font-family:'Epilogue',sans-serif;font-weight:800;font-size:14px;cursor:pointer;margin-bottom:6px;" id="buy-btn" onclick="sNav('my-tickets',null)">Buy Now — ₹799</button><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--mid);text-align:center;">🔒 Secure payment · Instant QR delivery</div></div>
+      </div>
+    </div>
+    <div class="s-screen" id="ss-my-tickets">
+      <div style="margin-bottom:16px;"><div class="ef" style="font-size:22px;font-weight:900;margin-bottom:4px;">My <span style="color:var(--sk)">Tickets</span></div><div class="mono" style="font-size:11px;color:var(--mid);">2 upcoming events</div></div>
+      <div class="my-ticket-card"><div class="mtc-left" style="background:var(--v)"></div><div class="mtc-body"><div class="mtc-fest ef">TechFest VJTI '26</div><div class="mtc-meta mono">May 22–24, 2026 · VJTI Auditorium, Mumbai</div><div style="display:flex;align-items:center;gap:8px;"><span class="sbadge" style="background:var(--vl);color:var(--v);">VIP PASS</span><span class="mono" style="font-size:11px;color:var(--mid);">₹799 · 1 ticket</span></div></div><div class="mtc-right"><div class="mtc-qr">📱</div><div class="mtc-code mono">TF25-V-4821</div></div></div>
+      <div class="my-ticket-card"><div class="mtc-left" style="background:var(--sk)"></div><div class="mtc-body"><div class="mtc-fest ef">Enthusia '26 — VIT Pune</div><div class="mtc-meta mono">Jul 5–7, 2026 · VIT Campus, Pune</div><div style="display:flex;align-items:center;gap:8px;"><span class="sbadge" style="background:var(--sl);color:#0077aa;">STANDARD PASS</span><span class="mono" style="font-size:11px;color:var(--mid);">₹299 · 2 tickets</span></div></div><div class="mtc-right"><div class="mtc-qr">📱</div><div class="mtc-code mono">EN25-S-9034</div></div></div>
+      <div style="margin-top:16px;"><button style="background:var(--v);color:white;border:none;padding:10px 20px;border-radius:8px;font-family:'Epilogue',sans-serif;font-weight:700;font-size:13px;cursor:pointer;" onclick="sNav('discover',null)">Discover More Events →</button></div>
+    </div>
+
+    <!-- ── VOLUNTEER INVITES ── -->
+    <div class="s-screen" id="ss-vol-invites">
+      <div style="margin-bottom:20px;">
+        <div class="ef" style="font-size:22px;font-weight:900;margin-bottom:4px;">Volunteer <span style="color:var(--sk)">Invites</span></div>
+        <div class="mono" style="font-size:11px;color:var(--mid);">Organizers are looking for you — 3 new invitations</div>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;">
+        <button class="s-filter-btn on" onclick="sVolFilter(this)">All (3)</button>
+        <button class="s-filter-btn" onclick="sVolFilter(this)">New</button>
+        <button class="s-filter-btn" onclick="sVolFilter(this)">Accepted</button>
+        <button class="s-filter-btn" onclick="sVolFilter(this)">Declined</button>
+      </div>
+
+      <!-- Invite 1 — NEW -->
+      <div class="vol-invite-card new-invite">
+        <div class="vi-header">
+          <div class="vi-fest-ico" style="background:linear-gradient(135deg,#1a0a3e,#2d1260)">⚡</div>
+          <div>
+            <div class="vi-fest-name ef">TechFest VJTI '26</div>
+            <div class="vi-fest-meta mono">VJTI Mumbai · May 22–24, 2026</div>
+          </div>
+          <div class="vi-role-badge">
+            <span class="sbadge" style="background:var(--sl);color:#0077aa;">REGISTRATION DESK</span>
+            <div style="display:flex;align-items:center;gap:5px;justify-content:flex-end;margin-top:5px;"><div class="vi-new-dot"></div><span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--sk);">NEW</span></div>
+          </div>
+        </div>
+        <div class="vi-details">
+          <div class="vi-detail-item"><div class="vi-detail-lbl">Department</div><div class="vi-detail-val">General</div></div>
+          <div class="vi-detail-item"><div class="vi-detail-lbl">Spots Open</div><div class="vi-detail-val" style="color:var(--sk)">5 of 5</div></div>
+          <div class="vi-detail-item"><div class="vi-detail-lbl">Apply By</div><div class="vi-detail-val">Mar 21, 2026</div></div>
+        </div>
+        <div class="vi-footer">
+          <div class="vi-desc">Volunteers needed at registration on Day 1 (8AM–12PM). Laptop skills required. Certificate + free full-access pass included.</div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:12px;">
+          <button class="btn-accept" onclick="acceptInvite(this)">✓ Accept Invite</button>
+          <button class="btn-decline">Decline</button>
+          <button class="btn-ghost-sm" style="margin-left:auto;padding:7px 14px;font-size:11px;" onclick="sNav('event-detail',null)">View Event →</button>
+        </div>
+      </div>
+
+      <!-- Invite 2 — NEW -->
+      <div class="vol-invite-card new-invite">
+        <div class="vi-header">
+          <div class="vi-fest-ico" style="background:linear-gradient(135deg,#1a0a3e,#2d1260)">⚡</div>
+          <div>
+            <div class="vi-fest-name ef">TechFest VJTI '26</div>
+            <div class="vi-fest-meta mono">VJTI Mumbai · May 22–24, 2026</div>
+          </div>
+          <div class="vi-role-badge">
+            <span class="sbadge" style="background:var(--vl);color:var(--v);">STAGE & BACKSTAGE</span>
+            <div style="display:flex;align-items:center;gap:5px;justify-content:flex-end;margin-top:5px;"><div class="vi-new-dot"></div><span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--sk);">NEW</span></div>
+          </div>
+        </div>
+        <div class="vi-details">
+          <div class="vi-detail-item"><div class="vi-detail-lbl">Department</div><div class="vi-detail-val">Logistics</div></div>
+          <div class="vi-detail-item"><div class="vi-detail-lbl">Spots Open</div><div class="vi-detail-val" style="color:var(--lm)">5 of 8</div></div>
+          <div class="vi-detail-item"><div class="vi-detail-lbl">Apply By</div><div class="vi-detail-val">Mar 20, 2026</div></div>
+        </div>
+        <div class="vi-footer">
+          <div class="vi-desc">Stage setup and breakdown across all 3 days. Physical work involved — suitable for energetic students. Certificate provided.</div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:12px;">
+          <button class="btn-accept" onclick="acceptInvite(this)">✓ Accept Invite</button>
+          <button class="btn-decline">Decline</button>
+          <button class="btn-ghost-sm" style="margin-left:auto;padding:7px 14px;font-size:11px;" onclick="sNav('event-detail',null)">View Event →</button>
+        </div>
+      </div>
+
+      <!-- Invite 3 — Different event -->
+      <div class="vol-invite-card new-invite">
+        <div class="vi-header">
+          <div class="vi-fest-ico" style="background:linear-gradient(135deg,#1a2200,#2d3a00)">🚀</div>
+          <div>
+            <div class="vi-fest-name ef">Enthusia '26 — VIT Pune</div>
+            <div class="vi-fest-meta mono">VIT Pune · Jul 5–7, 2026</div>
+          </div>
+          <div class="vi-role-badge">
+            <span class="sbadge" style="background:var(--ll);color:#5a8a00;">SOCIAL MEDIA TEAM</span>
+            <div style="display:flex;align-items:center;gap:5px;justify-content:flex-end;margin-top:5px;"><div class="vi-new-dot"></div><span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--sk);">NEW</span></div>
+          </div>
+        </div>
+        <div class="vi-details">
+          <div class="vi-detail-item"><div class="vi-detail-lbl">Department</div><div class="vi-detail-val">Marketing</div></div>
+          <div class="vi-detail-item"><div class="vi-detail-lbl">Spots Open</div><div class="vi-detail-val" style="color:var(--lm)">2 of 4</div></div>
+          <div class="vi-detail-item"><div class="vi-detail-lbl">Apply By</div><div class="vi-detail-val">Jun 10, 2026</div></div>
+        </div>
+        <div class="vi-footer">
+          <div class="vi-desc">Create reels & live posts during the fest. Need someone with Instagram/YouTube skills. Travel + stay covered by organizers.</div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:12px;">
+          <button class="btn-accept" onclick="acceptInvite(this)">✓ Accept Invite</button>
+          <button class="btn-decline">Decline</button>
+          <button class="btn-ghost-sm" style="margin-left:auto;padding:7px 14px;font-size:11px;">View Event →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── STUDENT ACCOUNT ── -->
+    <div class="s-screen" id="ss-s-account">
+      <div class="s-acc-hero">
+        <div class="s-acc-av ef">RS</div>
+        <div>
+          <div class="s-acc-name ef">Riya Sharma</div>
+          <div class="s-acc-role mono">Student · FestFlow</div>
+          <div class="s-acc-college">B.Tech Computer Science · VJTI, Mumbai · 3rd Year</div>
+          <div style="margin-top:8px;display:flex;gap:7px;position:relative;">
+            <span class="sbadge" style="background:var(--sl);color:#0077aa;">2 TICKETS</span>
+            <span class="sbadge" style="background:var(--ll);color:#5a8a00;">3 VOL INVITES</span>
+            <span class="sbadge" style="background:var(--vl);color:var(--v);">MEMBER SINCE JAN '25</span>
+          </div>
+        </div>
+        <div style="margin-left:auto;position:relative;"><button style="background:rgba(56,189,248,.2);color:var(--sk);border:1px solid rgba(56,189,248,.3);padding:8px 16px;border-radius:8px;font-family:'Epilogue',sans-serif;font-weight:700;font-size:12px;cursor:pointer;">Edit Profile</button></div>
+      </div>
+
+      <div class="s-acc-grid">
+        <div class="s-acc-section">
+          <div class="s-acc-sec-title ef">Personal Details</div>
+          <div class="s-acc-field"><div class="s-acc-lbl mono">Full Name</div><div class="s-acc-val">Riya Sharma</div></div>
+          <div class="s-acc-field"><div class="s-acc-lbl mono">Email</div><div class="s-acc-val">riya.sharma@vjti.ac.in</div></div>
+          <div class="s-acc-field"><div class="s-acc-lbl mono">Phone</div><div class="s-acc-val">+91 98123 45678</div></div>
+          <div class="s-acc-field"><div class="s-acc-lbl mono">College</div><div class="s-acc-val">VJTI, Mumbai</div></div>
+          <div class="s-acc-field"><div class="s-acc-lbl mono">Course & Year</div><div class="s-acc-val">B.Tech CSE · 3rd Year</div></div>
+        </div>
+        <div class="s-acc-section">
+          <div class="s-acc-sec-title ef">My Activity</div>
+          <div class="s-acc-field"><div class="s-acc-lbl mono">Tickets Purchased</div><div class="s-acc-val ef" style="font-size:22px;font-weight:900;color:var(--sk);">2</div></div>
+          <div class="s-acc-field"><div class="s-acc-lbl mono">Events Attended</div><div class="s-acc-val ef" style="font-size:22px;font-weight:900;color:var(--lm);">5</div></div>
+          <div class="s-acc-field"><div class="s-acc-lbl mono">Volunteer Invites</div><div class="s-acc-val ef" style="font-size:22px;font-weight:900;color:var(--v);">3</div></div>
+          <div class="s-acc-field"><div class="s-acc-lbl mono">Member Since</div><div class="s-acc-val">January 2025</div></div>
+        </div>
+        <div class="s-acc-section">
+          <div class="s-acc-sec-title ef">Interests</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;">
+            <span class="sbadge" style="background:var(--vl);color:var(--v);">⚡ Technical</span>
+            <span class="sbadge" style="background:var(--sl);color:#0077aa;">🎭 Cultural</span>
+            <span class="sbadge" style="background:var(--ll);color:#5a8a00;">🎵 Music</span>
+            <span class="sbadge" style="background:var(--cl);color:var(--cr);">🏆 Competitions</span>
+            <span class="sbadge" style="background:var(--d4);color:var(--mid);">🤖 AI / ML</span>
+            <span class="sbadge" style="background:var(--d4);color:var(--mid);">📱 App Dev</span>
+          </div>
+          <button class="btn-ghost-sm" style="margin-top:12px;width:100%;font-size:11px;">Edit Interests</button>
+        </div>
+        <div class="s-acc-section">
+          <div class="s-acc-sec-title ef">Notifications</div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:13px;">New events near me</span><div style="width:36px;height:20px;background:var(--sk);border-radius:10px;position:relative;cursor:pointer;"><div style="width:16px;height:16px;background:white;border-radius:50%;position:absolute;right:2px;top:2px;"></div></div></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:13px;">Volunteer invites</span><div style="width:36px;height:20px;background:var(--sk);border-radius:10px;position:relative;cursor:pointer;"><div style="width:16px;height:16px;background:white;border-radius:50%;position:absolute;right:2px;top:2px;"></div></div></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:13px;">Ticket reminders</span><div style="width:36px;height:20px;background:var(--sk);border-radius:10px;position:relative;cursor:pointer;"><div style="width:16px;height:16px;background:white;border-radius:50%;position:absolute;right:2px;top:2px;"></div></div></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:13px;">Promotional offers</span><div style="width:36px;height:20px;background:var(--d4);border-radius:10px;position:relative;cursor:pointer;"><div style="width:16px;height:16px;background:white;border-radius:50%;position:absolute;left:2px;top:2px;"></div></div></div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:14px;display:flex;gap:8px;">
+        <button style="background:var(--d3);color:#aaa;border:1px solid var(--d4);padding:9px 18px;border-radius:8px;font-family:'Epilogue',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">Change Password</button>
+        <button style="background:transparent;color:var(--cr);border:1px solid rgba(255,77,109,.3);padding:9px 18px;border-radius:8px;font-family:'Epilogue',sans-serif;font-size:12px;cursor:pointer;">Sign Out</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════ VENDOR ══════════════════════════ -->
+<div class="iface" id="iface-ven">
+  <div class="v-topbar">
+    <div class="v-logo ef">fest<span>FLOW</span><span class="v-logo-sub">for Brands</span></div>
+    <div class="v-nav">
+      <div class="v-nav-item on" onclick="vNav('v-dash',this)">Dashboard</div>
+      <div class="v-nav-item" onclick="vNav('v-browse',this)">Browse Fests</div>
+      <div class="v-nav-item" onclick="vNav('v-offers',this)">View Offers <span style="background:var(--v);color:white;font-size:8px;padding:2px 6px;border-radius:4px;font-weight:700;margin-left:3px;font-family:'DM Mono',monospace;">2</span></div>
+      <div class="v-nav-item" onclick="vNav('v-offer',this)">Submit Offer</div>
+      <div class="v-nav-item" onclick="vNav('v-analytics',this)">Analytics</div>
+    </div>
+    <div class="v-spacer"></div>
+    <button class="v-cta-btn ef" onclick="vNav('v-offer',document.querySelector('.v-nav-item'))">+ Post Offer</button>
+    <div class="v-user"><div class="v-user-av ef">Z</div>Zomato</div>
+  </div>
+  <div class="v-body">
+    <div class="v-screen on" id="vs-v-dash">
+      <div class="v-pg-title ef">Welcome back, <span style="color:var(--v)">Zomato.</span></div>
+      <div class="v-pg-sub mono">Your sponsorship portal — 3 active deals</div>
+      <div class="v-stat-grid"><div class="v-stat"><div class="v-stat-lbl mono">Active Deals</div><div class="v-stat-val ef">3</div><div class="v-stat-sub mono">+1 this month</div></div><div class="v-stat"><div class="v-stat-lbl mono">Total Invested</div><div class="v-stat-val ef">₹1.65L</div><div class="v-stat-sub mono">FY 2024-25</div></div><div class="v-stat"><div class="v-stat-lbl mono">Fests Reached</div><div class="v-stat-val ef">5</div><div class="v-stat-sub mono">12 colleges</div></div><div class="v-stat"><div class="v-stat-lbl mono">Pending</div><div class="v-stat-val ef" style="color:var(--cr)">2</div><div class="v-stat-sub mono">Awaiting response</div></div></div>
+      <div class="v-two">
+        <div class="v-card"><div class="v-card-title ef">Active Sponsorships</div><div class="v-deal-row"><div class="v-di" style="background:#fff0e8">🎪</div><div><div class="v-dn ef">TechFest VJTI '26</div><div class="v-dm mono">May 22-24 · Mumbai · 2,000 students</div></div><div style="flex:1"></div><div style="text-align:right"><div class="v-da ef">₹50,000</div><span class="vsp-acc">CONFIRMED</span></div></div><div class="v-deal-row"><div class="v-di" style="background:#f0e8ff">🎭</div><div><div class="v-dn ef">Mood Indigo IIT-B</div><div class="v-dm mono">Dec 12-15 · Mumbai · 10,000 students</div></div><div style="flex:1"></div><div style="text-align:right"><div class="v-da ef">₹80,000</div><span class="vsp-pen">PENDING</span></div></div><div class="v-deal-row"><div class="v-di" style="background:#e8f8ff">🏆</div><div><div class="v-dn ef">Kshitij IIT KGP</div><div class="v-dm mono">Feb 8-10 · Kharagpur · 5,000</div></div><div style="flex:1"></div><div style="text-align:right"><div class="v-da ef">₹35,000</div><span class="vsp-acc">CONFIRMED</span></div></div></div>
+        <div class="v-card"><div class="v-card-title ef">Recommended for You</div><div class="fest-card-v"><div class="fc-banner" style="background:linear-gradient(135deg,#f0e8ff,#e8f0ff)">🎪</div><div class="fc-body"><div class="fc-name ef">Enthusia — VIT Pune</div><div class="fc-meta mono">Apr 5-7 · Pune · 3,500 footfall</div><div class="fc-tags"><span class="fc-tag" style="background:rgba(56,189,248,.12);color:#0077aa">CULTURAL</span><span class="fc-tag" style="background:rgba(200,241,53,.12);color:#5a8a00;margin-left:4px">TRENDING 🔥</span></div><button class="v-out-btn ef">View Proposal →</button></div></div></div>
+      </div>
+    </div>
+    <div class="v-screen" id="vs-v-browse">
+      <div class="v-pg-title ef">Browse <span style="color:var(--v)">Opportunities</span></div>
+      <div class="v-pg-sub mono">24 active fest listings across India</div>
+      <div style="display:flex;gap:8px;margin-bottom:18px;align-items:center;flex-wrap:wrap;"><div style="flex:1;background:white;border:1px solid #ede8de;border-radius:8px;padding:9px 13px;font-family:'DM Mono',monospace;font-size:11px;color:#bbb;min-width:140px;">🔍 Search fests...</div><select style="background:white;border:1px solid #ede8de;color:#555;font-family:'DM Mono',monospace;font-size:10px;padding:9px 12px;border-radius:8px;cursor:pointer;"><option>All Types</option><option>Technical</option><option>Cultural</option></select><select style="background:white;border:1px solid #ede8de;color:#555;font-family:'DM Mono',monospace;font-size:10px;padding:9px 12px;border-radius:8px;cursor:pointer;"><option>Any City</option><option>Mumbai</option><option>Pune</option></select></div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;">
+        <div class="fest-card-v"><div class="fc-banner" style="background:linear-gradient(135deg,#1a0a3e,#2d1a6e);color:var(--lm)">⚡</div><div class="fc-body"><div class="fc-name ef">TechFest VJTI '26</div><div class="fc-meta mono">May 22-24 · Mumbai · 2,000 est.</div><div class="fc-tags"><span class="fc-tag" style="background:rgba(124,58,237,.1);color:var(--v)">TECHNICAL</span></div><button class="v-out-btn ef" onclick="vNav('v-offer',null)">Sponsor This Fest →</button></div></div>
+        <div class="fest-card-v"><div class="fc-banner" style="background:linear-gradient(135deg,#003a52,#001a30);color:var(--sk)">🎭</div><div class="fc-body"><div class="fc-name ef">Mood Indigo IIT-B</div><div class="fc-meta mono">Dec 12-15 · Mumbai · 10,000 est.</div><div class="fc-tags"><span class="fc-tag" style="background:rgba(56,189,248,.1);color:#0077aa">CULTURAL</span><span class="fc-tag" style="background:rgba(200,241,53,.12);color:#5a8a00;margin-left:3px">TRENDING</span></div><button class="v-out-btn ef">Sponsor This Fest →</button></div></div>
+        <div class="fest-card-v"><div class="fc-banner" style="background:linear-gradient(135deg,#1a2200,#2d3a00);color:var(--lm)">🏆</div><div class="fc-body"><div class="fc-name ef">Kshitij IIT-KGP</div><div class="fc-meta mono">Feb 8-10 · Kharagpur · 5,000 est.</div><div class="fc-tags"><span class="fc-tag" style="background:rgba(124,58,237,.1);color:var(--v)">TECHNICAL</span></div><button class="v-out-btn ef">Sponsor This Fest →</button></div></div>
+      </div>
+    </div>
+    <div class="v-screen" id="vs-v-offer">
+      <div class="v-pg-title ef">Submit <span style="color:var(--v)">Sponsorship Offer</span></div>
+      <div class="v-pg-sub mono">Fill in your offer details below</div>
+      <div style="display:grid;grid-template-columns:1fr 300px;gap:18px;max-width:840px;">
+        <div class="v-card"><div class="v-card-title ef">Offer Details</div>
+          <div style="margin-bottom:12px;"><label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:#bbb;margin-bottom:5px;display:block;text-transform:uppercase;">Select Fest</label><select style="width:100%;background:#faf7f2;border:1px solid #ede8de;color:var(--ink);font-family:'DM Sans',sans-serif;font-size:13px;padding:10px 13px;border-radius:8px;outline:none;cursor:pointer;"><option>TechFest VJTI '26</option><option>Mood Indigo IIT-B</option><option>Kshitij IIT-KGP</option></select></div>
+          <div style="margin-bottom:12px;"><label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:#bbb;margin-bottom:5px;display:block;text-transform:uppercase;">Sponsorship Type</label><select style="width:100%;background:#faf7f2;border:1px solid #ede8de;color:var(--ink);font-family:'DM Sans',sans-serif;font-size:13px;padding:10px 13px;border-radius:8px;outline:none;cursor:pointer;"><option>Title Sponsor</option><option>Co-Sponsor</option><option>Associate Sponsor</option><option>Vendor / Stall</option></select></div>
+          <div style="margin-bottom:12px;"><label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:#bbb;margin-bottom:5px;display:block;text-transform:uppercase;">Offer Amount (₹)</label><input style="width:100%;background:#faf7f2;border:1px solid #ede8de;color:var(--ink);font-family:'DM Sans',sans-serif;font-size:13px;padding:10px 13px;border-radius:8px;outline:none;" placeholder="e.g. 50000" id="v-offer-amt" oninput="updateVPrev()"></div>
+          <div style="margin-bottom:12px;"><label style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:#bbb;margin-bottom:5px;display:block;text-transform:uppercase;">Deliverables</label><textarea style="width:100%;background:#faf7f2;border:1px solid #ede8de;color:var(--ink);font-family:'DM Sans',sans-serif;font-size:13px;padding:10px 13px;border-radius:8px;outline:none;min-height:80px;resize:vertical;" placeholder="e.g. Logo on banners, 2 stalls, social mentions..."></textarea></div>
+        </div>
+        <div><div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:#bbb;margin-bottom:8px;text-transform:uppercase;">Offer Preview</div><div style="background:#faf7f2;border:2px solid #ede8de;border-radius:12px;padding:18px;text-align:center;margin-bottom:12px;"><span style="display:inline-block;background:var(--v);color:white;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;padding:4px 10px;border-radius:4px;margin-bottom:10px;">SPONSORSHIP OFFER</span><div class="ef" style="font-size:15px;font-weight:800;color:var(--ink);margin-bottom:4px;">Zomato → TechFest VJTI</div><div style="font-family:'DM Mono',monospace;font-size:10px;color:#bbb;">Title Sponsor · Mar 22-24</div><div class="ef" style="font-size:28px;font-weight:900;color:var(--v);margin:10px 0" id="v-prev-amt">₹0</div><div style="font-family:'DM Mono',monospace;font-size:10px;color:#bbb;">Est. 2,000 student reach</div></div><button class="v-cta-btn ef" style="width:100%;padding:12px;font-size:14px;border-radius:10px;margin-bottom:8px;">Submit Offer →</button><button style="background:transparent;color:#aaa;border:1px solid #ede8de;padding:10px;border-radius:8px;font-family:'Epilogue',sans-serif;font-size:13px;font-weight:600;cursor:pointer;width:100%;">Save as Draft</button></div>
+      </div>
+    </div>
+    <!-- ── VIEW OFFERS ── -->
+    <div class="v-screen" id="vs-v-offers">
+      <div class="v-pg-title ef">View <span style="color:var(--v)">Offers</span></div>
+      <div class="v-pg-sub mono">Sponsorship proposals from organizers — respond to grow your brand presence</div>
+
+      <div class="voc-status-bar">
+        <div class="voc-stat-pill"><div class="voc-stat-pill-lbl">New Offers</div><div class="voc-stat-pill-val" style="color:var(--v)">2</div></div>
+        <div class="voc-stat-pill"><div class="voc-stat-pill-lbl">Under Review</div><div class="voc-stat-pill-val" style="color:#f59e0b">1</div></div>
+        <div class="voc-stat-pill"><div class="voc-stat-pill-lbl">Accepted</div><div class="voc-stat-pill-val" style="color:#22c55e">3</div></div>
+        <div class="voc-stat-pill"><div class="voc-stat-pill-lbl">Declined</div><div class="voc-stat-pill-val" style="color:#aaa">1</div></div>
+      </div>
+
+      <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;color:#999;margin-bottom:12px;">NEW — AWAITING YOUR RESPONSE</div>
+
+      <!-- Offer 1 -->
+      <div class="v-offer-card v-offer-new">
+        <div class="voc-header">
+          <div class="voc-fest-ico" style="background:linear-gradient(135deg,#1a0a3e,#2d1260);color:var(--lm)">⚡</div>
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px;"><div class="voc-fest-name ef">TechFest VJTI '26</div><span class="voc-new-tag">NEW</span></div>
+            <div class="voc-organizer mono">Organizer: Aryan Kumar · VJTI, Mumbai</div>
+          </div>
+          <div class="voc-amount">
+            <div class="voc-amt-val ef">₹50,000</div>
+            <div class="voc-type mono">Title Sponsor</div>
+          </div>
+        </div>
+        <div class="voc-details">
+          <div><div class="voc-det-lbl">Event Date</div><div class="voc-det-val ef">May 22–24, '26</div></div>
+          <div><div class="voc-det-lbl">Footfall</div><div class="voc-det-val ef">2,000 students</div></div>
+          <div><div class="voc-det-lbl">Location</div><div class="voc-det-val ef">Mumbai</div></div>
+          <div><div class="voc-det-lbl">Type</div><div class="voc-det-val ef">Technical Fest</div></div>
+        </div>
+        <div class="voc-perks">
+          <div class="voc-perks-title">Deliverables Offered</div>
+          Logo on all banners & backdrops · 2 dedicated stalls · Social media mentions (3 posts) · Stage announcement on all 3 days · Certificate of association
+        </div>
+        <div class="voc-actions">
+          <button class="voc-accept-btn" onclick="acceptVendorOffer(this)">✓ Accept Offer</button>
+          <button class="voc-counter-btn">↩ Counter Offer</button>
+          <button class="voc-decline-btn">Decline</button>
+          <button class="btn-vsm" style="margin-left:auto;padding:8px 14px;" onclick="vNav('v-analytics',null)">View ROI Estimate →</button>
+        </div>
+      </div>
+
+      <!-- Offer 2 -->
+      <div class="v-offer-card v-offer-new">
+        <div class="voc-header">
+          <div class="voc-fest-ico" style="background:linear-gradient(135deg,#003a52,#001a30);color:var(--sk)">🎭</div>
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px;"><div class="voc-fest-name ef">Mood Indigo IIT-B</div><span class="voc-new-tag">NEW</span></div>
+            <div class="voc-organizer mono">Organizer: Priya Mehta · IIT Bombay</div>
+          </div>
+          <div class="voc-amount">
+            <div class="voc-amt-val ef">₹1,20,000</div>
+            <div class="voc-type mono">Gold Sponsor</div>
+          </div>
+        </div>
+        <div class="voc-details">
+          <div><div class="voc-det-lbl">Event Date</div><div class="voc-det-val ef">Dec 12–15, '25</div></div>
+          <div><div class="voc-det-lbl">Footfall</div><div class="voc-det-val ef">10,000+ students</div></div>
+          <div><div class="voc-det-lbl">Location</div><div class="voc-det-val ef">Mumbai</div></div>
+          <div><div class="voc-det-lbl">Type</div><div class="voc-det-val ef">Cultural Fest</div></div>
+        </div>
+        <div class="voc-perks">
+          <div class="voc-perks-title">Deliverables Offered</div>
+          Prime stage branding · 4 food delivery stalls on campus · Influencer shoutouts · Brand booth at main entry gate · 10K+ student social media reach guaranteed
+        </div>
+        <div class="voc-actions">
+          <button class="voc-accept-btn" onclick="acceptVendorOffer(this)">✓ Accept Offer</button>
+          <button class="voc-counter-btn">↩ Counter Offer</button>
+          <button class="voc-decline-btn">Decline</button>
+        </div>
+      </div>
+
+      <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;color:#999;margin:18px 0 12px;">ACCEPTED — CONFIRMED DEALS</div>
+
+      <!-- Offer 3 — accepted -->
+      <div class="v-offer-card" style="opacity:.75;">
+        <div class="voc-header">
+          <div class="voc-fest-ico" style="background:linear-gradient(135deg,#1a2200,#2d3a00);color:var(--lm)">🏆</div>
+          <div>
+            <div class="voc-fest-name ef">Kshitij IIT-KGP</div>
+            <div class="voc-organizer mono">Organizer: Sourav Das · IIT Kharagpur</div>
+          </div>
+          <div class="voc-amount">
+            <div class="voc-amt-val ef">₹35,000</div>
+            <div class="voc-type mono">Co-Sponsor</div>
+          </div>
+        </div>
+        <div class="voc-details">
+          <div><div class="voc-det-lbl">Event Date</div><div class="voc-det-val ef">Feb 8–10, '26</div></div>
+          <div><div class="voc-det-lbl">Footfall</div><div class="voc-det-val ef">5,000 students</div></div>
+          <div><div class="voc-det-lbl">Location</div><div class="voc-det-val ef">Kharagpur</div></div>
+          <div><div class="voc-det-lbl">Status</div><div class="voc-det-val ef" style="color:#22c55e">✓ Confirmed</div></div>
+        </div>
+        <div class="voc-actions">
+          <span class="sbadge" style="background:rgba(34,197,94,.12);color:#22c55e;padding:8px 16px;border-radius:7px;font-size:11px;">DEAL CONFIRMED ✓</span>
+          <button class="btn-vsm" style="margin-left:auto;padding:8px 14px;">View Contract →</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="v-screen" id="vs-v-analytics">
+      <div class="v-pg-title ef">ROI & <span style="color:var(--v)">Analytics</span></div>
+      <div class="v-pg-sub mono">Performance across all your sponsorships</div>
+      <div class="v-stat-grid"><div class="v-stat"><div class="v-stat-lbl mono">Total Reach</div><div class="v-stat-val ef">17,000</div><div class="v-stat-sub mono" style="color:#3a8a00">↑ 34%</div></div><div class="v-stat"><div class="v-stat-lbl mono">Engagement</div><div class="v-stat-val ef">8.4%</div><div class="v-stat-sub mono" style="color:#3a8a00">↑ 2.1%</div></div><div class="v-stat"><div class="v-stat-lbl mono">App Installs</div><div class="v-stat-val ef">1,240</div><div class="v-stat-sub mono">from fests</div></div><div class="v-stat"><div class="v-stat-lbl mono">Orders from Fests</div><div class="v-stat-val ef">3,820</div><div class="v-stat-sub mono" style="color:#3a8a00">↑ 18%</div></div></div>
+      <div class="v-card"><div class="v-card-title ef">Fest-wise Breakdown</div><table style="width:100%;border-collapse:collapse;font-size:12px;"><tr style="font-family:'DM Mono',monospace;font-size:9px;color:#bbb;text-align:left;border-bottom:1px solid #ede8de;"><th style="padding:8px 10px">FEST</th><th style="padding:8px 10px">SPEND</th><th style="padding:8px 10px">REACH</th><th style="padding:8px 10px">ORDERS</th><th style="padding:8px 10px">ROI</th><th style="padding:8px 10px">STATUS</th></tr><tr style="border-bottom:1px solid #faf7f2"><td style="padding:10px;font-family:'Epilogue',sans-serif;font-weight:700;color:var(--ink)">TechFest VJTI '26</td><td style="padding:10px;font-family:'DM Mono',monospace;color:var(--v);font-weight:700">₹50,000</td><td style="padding:10px;font-family:'DM Mono',monospace">2,800</td><td style="padding:10px;font-family:'DM Mono',monospace">1,240</td><td style="padding:10px;color:#3a8a00;font-weight:700;font-family:'Epilogue',sans-serif">2.4x</td><td style="padding:10px"><span class="vsp-acc">ACTIVE</span></td></tr><tr><td style="padding:10px;font-family:'Epilogue',sans-serif;font-weight:700;color:var(--ink)">Mood Indigo IIT-B</td><td style="padding:10px;font-family:'DM Mono',monospace;color:var(--v);font-weight:700">₹80,000</td><td style="padding:10px;font-family:'DM Mono',monospace">—</td><td style="padding:10px;font-family:'DM Mono',monospace">—</td><td style="padding:10px;color:#bbb">—</td><td style="padding:10px"><span class="vsp-pen">PENDING</span></td></tr></table></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// INTERFACE SWITCH
+function switchIface(id){
+  document.querySelectorAll('.iface').forEach(i=>i.classList.remove('active'));
+  document.querySelectorAll('.ps-btn').forEach(b=>b.classList.remove('active','org','stu','ven'));
+  document.getElementById('iface-'+id).classList.add('active');
+  const btn=document.getElementById('btn-'+id);
+  btn.classList.add('active',id);
+}
+
+// FEST DROPDOWN
+function toggleFD(){document.getElementById('fdrop').classList.toggle('open');}
+document.addEventListener('click',e=>{if(!document.getElementById('fdrop').contains(e.target))document.getElementById('fdrop').classList.remove('open');});
+const festData={
+  techfest:{name:"TechFest VJTI '26",meta:"May 22–24 · VJTI Auditorium, Mumbai · 2,000 expected",ico:"⚡",bg:"linear-gradient(135deg,#1a0a3e,#2d1260)",tags:`<span class="sbadge" style="background:var(--ll);color:#5a8a00;">ACTIVE</span><span class="sbadge" style="background:var(--sl);color:#0077aa;margin-left:5px;">TECHNICAL</span><span class="sbadge" style="background:var(--vl);color:var(--v);margin-left:5px;">840/1200 TICKETS</span>`,days:['Day 1 — May 22','Day 2 — May 23','Day 3 — May 24']},
+  culturals:{name:"Culturals 2026",meta:"Jun 10–11 · VJTI Grounds, Mumbai · 1,500 expected",ico:"🎭",bg:"linear-gradient(135deg,#003a52,#001a30)",tags:`<span class="sbadge" style="background:var(--sl);color:#0077aa;">PLANNING</span><span class="sbadge" style="background:var(--cl);color:var(--cr);margin-left:5px;">CULTURAL</span>`,days:['Day 1 — Apr 10','Day 2 — Apr 11']},
+  sports:{name:"Sports Day 2026",meta:"Feb 15 · VJTI Grounds, Mumbai · 800 attended",ico:"🏆",bg:"linear-gradient(135deg,#1a2200,#2d3a00)",tags:`<span class="sbadge" style="background:var(--d4);color:var(--mid);">COMPLETED</span><span class="sbadge" style="background:var(--ll);color:#5a8a00;margin-left:5px;">SPORTS</span>`,days:['Day 1 — Feb 15']}
+};
+function selFest(id){
+  const d=festData[id];
+  document.getElementById('fdrop-lbl').textContent=d.name;
+  document.querySelectorAll('.fopt').forEach(o=>o.classList.remove('active'));
+  document.getElementById('fopt-'+id).classList.add('active');
+  openEvent(id,document.getElementById('sub-'+id));
+  toggleFD();
+}
+
+// SIDEBAR COLLAPSE
+let sidebarOpen=true;
+function toggleSidebar(){
+  sidebarOpen=!sidebarOpen;
+  const sb=document.getElementById('o-sidebar');
+  const tb=document.getElementById('toggle-btn');
+  sb.classList.toggle('collapsed',!sidebarOpen);
+  tb.title=sidebarOpen?'Collapse sidebar':'Expand sidebar';
+  tb.textContent=sidebarOpen?'☰':'▶';
+}
+
+// NOTIFICATION PANEL
+function toggleNotif(){
+  document.getElementById('notif-wrap').classList.toggle('open');
+  document.getElementById('avatar-wrap').classList.remove('open');
+}
+function toggleAvatar(){
+  document.getElementById('avatar-wrap').classList.toggle('open');
+  document.getElementById('notif-wrap').classList.remove('open');
+}
+document.addEventListener('click',e=>{
+  if(!document.getElementById('notif-wrap').contains(e.target)) document.getElementById('notif-wrap').classList.remove('open');
+  if(!document.getElementById('avatar-wrap').contains(e.target)) document.getElementById('avatar-wrap').classList.remove('open');
+});
+
+// ORGANIZER NAV
+function showHome(){
+  document.querySelectorAll('.o-screen').forEach(s=>s.classList.remove('on'));
+  document.getElementById('screen-home').classList.add('on');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('on'));
+  document.getElementById('nav-home').classList.add('on');
+  document.querySelectorAll('.nav-sub-item').forEach(n=>n.classList.remove('on'));
+}
+function showAccount(){
+  document.querySelectorAll('.o-screen').forEach(s=>s.classList.remove('on'));
+  document.getElementById('screen-account').classList.add('on');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('on'));
+  document.getElementById('nav-account').classList.add('on');
+  document.getElementById('avatar-wrap').classList.remove('open');
+}
+function toggleEvSub(el){
+  const sub=document.getElementById('ev-sub');
+  const arr=document.getElementById('ev-arr');
+  const open=sub.classList.toggle('open');
+  arr.textContent=open?'▴':'▾';
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('on'));
+  el.classList.add('on');
+}
+function openEvent(id,subEl){
+  document.querySelectorAll('.o-screen').forEach(s=>s.classList.remove('on'));
+  document.getElementById('screen-event').classList.add('on');
+  const d=festData[id];
+  document.getElementById('ehdr-ico').textContent=d.ico;
+  document.getElementById('ehdr-ico').style.background=d.bg;
+  document.getElementById('ehdr-name').textContent=d.name;
+  document.getElementById('ehdr-meta').textContent=d.meta;
+  document.getElementById('ehdr-tags').innerHTML=d.tags;
+  document.getElementById('fdrop-lbl').textContent=d.name;
+  const dtr=document.getElementById('day-tabs-row');
+  dtr.innerHTML=d.days.map((day,i)=>`<button class="day-tab ${i===0?'on':''}" onclick="switchDay(${i},this)">${day}</button>`).join('');
+  [0,1,2].forEach(i=>{const p=document.getElementById('dp-'+i);if(p)p.style.display=i===0?'block':'none';});
+  showMod('overview',document.querySelector('.mod-tab'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('on'));
+  document.getElementById('nav-events').classList.add('on');
+  document.querySelectorAll('.nav-sub-item').forEach(n=>n.classList.remove('on'));
+  if(subEl)subEl.classList.add('on');
+  document.getElementById('ev-sub').classList.add('open');
+  document.getElementById('ev-arr').textContent='▴';
+}
+
+// MODULE TABS
+function showMod(id,el){
+  document.querySelectorAll('.mod-panel').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.mod-tab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('mp-'+id).classList.add('on');
+  if(el)el.classList.add('on');
+}
+
+// DAY SWITCH
+function switchDay(idx,el){
+  document.querySelectorAll('.day-tab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+  [0,1,2].forEach(i=>{const p=document.getElementById('dp-'+i);if(p)p.style.display=i===idx?'block':'none';});
+}
+
+// VENDOR SURF
+let selCount=0;
+function toggleSelect(btn){
+  const sel=btn.classList.contains('selected');
+  if(sel){btn.classList.remove('selected');btn.textContent='+ Select';selCount--;}
+  else{btn.classList.add('selected');btn.textContent='✓ Selected';selCount++;}
+  document.getElementById('sel-count').textContent=selCount+' vendor'+(selCount!==1?'s':'');
+}
+function vcatFilter(btn){
+  document.querySelectorAll('.vcat-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+}
+
+// MODALS
+function openActModal(){document.getElementById('modal-act').classList.add('open');}
+function openExpModal(){document.getElementById('modal-exp').classList.add('open');}
+function showCreateModal(){document.getElementById('modal-create').classList.add('open');}
+
+// STUDENT NAV
+function sNav(id,el){
+  document.querySelectorAll('.s-screen').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.s-nav-tab').forEach(t=>t.classList.remove('on'));
+  // handle both 'ss-X' and raw id formats
+  const scId = id.startsWith('ss-') ? id : 'ss-'+id;
+  const sc=document.getElementById(scId);
+  if(sc)sc.classList.add('on');
+  if(el&&el.classList&&el.classList.contains('s-nav-tab'))el.classList.add('on');
+}
+function sDayTab(idx,el){
+  document.querySelectorAll('.s-sched-dtab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+  [0,1,2].forEach(i=>{const d=document.getElementById('sd-'+i);if(d)d.style.display=i===idx?'block':'none';});
+}
+let tPrice=799,tQty=1;
+function selTier(el){
+  document.querySelectorAll('.ticket-tier').forEach(t=>t.classList.remove('sel'));
+  el.classList.add('sel');
+  const p=[799,399,149];
+  tPrice=p[Array.from(document.querySelectorAll('.ticket-tier')).indexOf(el)]||399;
+  updateTot();
+}
+function changeQty(d){tQty=Math.max(1,Math.min(10,tQty+d));document.getElementById('qty-val').textContent=tQty;updateTot();}
+function updateTot(){const t=tPrice*tQty;document.getElementById('ticket-total').textContent='₹'+t.toLocaleString('en-IN');document.getElementById('buy-btn').textContent='Buy Now — ₹'+t.toLocaleString('en-IN');}
+
+// VENDOR NAV
+function vNav(id,el){
+  document.querySelectorAll('.v-screen').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.v-nav-item').forEach(n=>n.classList.remove('on'));
+  const sc=document.getElementById('vs-'+id);
+  if(sc)sc.classList.add('on');
+  if(el&&el.classList&&el.classList.contains('v-nav-item'))el.classList.add('on');
+}
+function updateVPrev(){const a=document.getElementById('v-offer-amt').value;document.getElementById('v-prev-amt').textContent=a?'₹'+Number(a).toLocaleString('en-IN'):'₹0';}
+
+// STUDENT FILTERS
+document.querySelectorAll('.s-filter-btn').forEach(btn=>{btn.addEventListener('click',()=>{document.querySelectorAll('.s-filter-btn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');});});
+
+// ORGANIZER: SHOW BROWSE
+function showBrowse(){
+  document.querySelectorAll('.o-screen').forEach(s=>s.classList.remove('on'));
+  document.getElementById('screen-browse').classList.add('on');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('on'));
+  document.getElementById('nav-browse').classList.add('on');
+  document.querySelectorAll('.nav-sub-item').forEach(n=>n.classList.remove('on'));
+}
+
+// ORGANIZER: BROWSE TAB SWITCH
+function switchBrowseTab(id,el){
+  document.querySelectorAll('.browse-tab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.browse-panel').forEach(p=>p.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('bp-'+id).classList.add('on');
+}
+
+// STUDENT: VOL INVITE FILTER
+function sVolFilter(btn){
+  document.querySelectorAll('.s-screen.on .s-filter-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+}
+
+// STUDENT: ACCEPT INVITE
+function acceptInvite(btn){
+  const card=btn.closest('.vol-invite-card');
+  card.style.borderLeftColor='var(--lm)';
+  btn.textContent='✓ Accepted!';
+  btn.style.background='var(--lm)';
+  btn.style.color='var(--ink)';
+  btn.disabled=true;
+  card.querySelector('.btn-decline').style.display='none';
+  const dot=card.querySelector('.vi-new-dot');
+  if(dot){dot.style.background='var(--lm)';}
+}
+
+// VENDOR: ACCEPT OFFER
+function acceptVendorOffer(btn){
+  const card=btn.closest('.v-offer-card');
+  card.style.borderLeft='3px solid #22c55e';
+  card.style.opacity='.8';
+  const actions=card.querySelector('.voc-actions');
+  actions.innerHTML='<span class="sbadge" style="background:rgba(34,197,94,.12);color:#22c55e;padding:8px 16px;border-radius:7px;font-size:11px;">OFFER ACCEPTED ✓</span><button class="btn-vsm" style="margin-left:auto;padding:8px 14px;">View Contract →</button>';
+}
+</script>
+</body>
+</html>
